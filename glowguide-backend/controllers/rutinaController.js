@@ -1,0 +1,141 @@
+const sequelize = require('../db');
+
+exports.genereazaRutina = async (req, res) => {
+    // Luăm id-ul membrului trimis de frontend
+    const { membruId } = req.body; 
+
+    try {
+        // 1. Obținem profilul dermatologic al membrului din baza de date
+        const [profilResult] = await sequelize.query(
+            'SELECT * FROM ProfilDermatologic WHERE membruId = ?',
+            { replacements: [membruId] }
+        );
+
+        if (profilResult.length === 0) {
+            return res.status(404).json({ eroare: 'Profilul dermatologic nu a fost găsit. Te rugăm să îl completezi!' });
+        }
+
+        const profil = profilResult[0];
+        const tipTenUser = profil.tipTen;
+        
+        // Parsăm alergiile (dacă există) dintr-un string JSON într-un array real
+        let alergeniArray = [];
+        if (profil.alergii) {
+             try {
+                alergeniArray = JSON.parse(profil.alergii);
+             } catch(e) {
+                console.log("Alergiile nu sunt un JSON valid", e);
+             }
+        }
+
+        // 2. Arhivăm o rutină veche, dacă membrul avea deja una activă
+        await sequelize.query('CALL arhiveazaRutinaVeche(?)', { replacements: [membruId] });
+
+        // Categoriile standard pe care trebuie să le conțină rutina
+        const categorii = ['curatare', 'toner', 'ser', 'hidratant', 'spf'];
+        const produseRecomandate = [];
+
+        // 3. Sistemul Expert: Cautăm produsul ideal pentru fiecare categorie
+        for (let i = 0; i < categorii.length; i++) {
+            const categorie = categorii[i];
+            
+            let excludereAlergeniSql = '';
+            // "%" permite căutarea de tip LIKE. Ex: dacă produsul scrie 'normal,mixt', va găsi 'mixt'
+            let replacements = [categorie, `%${tipTenUser}%`];
+
+            // Dacă utilizatorul are alergii, adăugăm o regulă SQL complexă cu NOT EXISTS
+            if (alergeniArray.length > 0) {
+                const placeholders = alergeniArray.map(() => '?').join(',');
+                excludereAlergeniSql = `
+                    AND NOT EXISTS (
+                        SELECT 1 FROM ProdusIngredient pi
+                        JOIN Ingredient i ON pi.ingredientId = i.id
+                        WHERE pi.produsId = p.id AND i.nume IN (${placeholders})
+                    )
+                `;
+                replacements.push(...alergeniArray); // adăugăm alergenii în variabilele interogării
+            }
+
+            // Query-ul principal de căutare
+            const queryText = `
+                SELECT DISTINCT p.id, p.nume, p.brand, p.categorie, p.rating
+                FROM Produs p
+                WHERE p.categorie = ?
+                  AND p.tipTenRecomandat LIKE ?
+                  ${excludereAlergeniSql}
+                ORDER BY p.rating DESC
+                LIMIT 1
+            `;
+
+            const [produsGasit] = await sequelize.query(queryText, { replacements });
+
+            // Dacă baza de date a găsit un produs bun, îl adăugăm la lista finală
+            if (produsGasit.length > 0) {
+                produseRecomandate.push(produsGasit[0]);
+            }
+        }
+
+        // 4. Creăm instanța noii rutine în baza de date
+        const [insertRutina] = await sequelize.query(
+            `INSERT INTO Rutina (membruId, tip, status) VALUES (?, 'completa', 'activa')`,
+            { replacements: [membruId] }
+        );
+        const rutinaId = insertRutina; // preluăm ID-ul auto_increment generat
+
+        // 5. Asociem fiecare produs găsit cu rutina nou creată, salvând ordinea de aplicare
+        for (let i = 0; i < produseRecomandate.length; i++) {
+            const produs = produseRecomandate[i];
+            await sequelize.query(
+                `INSERT INTO RutinaProdus (rutinaId, produsId, ordineAplicare) VALUES (?, ?, ?)`,
+                { replacements: [rutinaId, produs.id, i + 1] }
+            );
+        }
+
+        // --- PREGĂTIRE RĂSPUNS CĂTRE FRONTEND ---
+        
+        // Transformăm coloana de probleme din DB înapoi în Array ca să o afișăm frumos
+        let problemeAfisare = [];
+        try {
+            if (profil.probleme) {
+                problemeAfisare = JSON.parse(profil.probleme);
+            }
+        } catch(e) {
+            console.log("Eroare la parsarea problemelor din DB");
+        }
+
+        // Returnăm tot pachetul
+        res.json({
+            mesaj: 'Rutina a fost generată cu succes!',
+            rutinaId: rutinaId,
+            profilUtilizator: {
+                tipTen: profil.tipTen,
+                probleme: problemeAfisare
+            },
+            produse: produseRecomandate
+        });
+
+    } catch (error) {
+        console.error("Eroare generare rutina:", error);
+        res.status(500).json({ eroare: 'Eroare internă la generarea rutinei.' });
+    }
+};
+
+// ============================================
+// FUNCȚIA DE SALVARE A CHESTIONARULUI DERMATOLOGIC
+// ============================================
+exports.salveazaProfil = async (req, res) => {
+    const { membruId, tipTen, alergii, probleme } = req.body;
+    try {
+        // Folosim ON DUPLICATE KEY UPDATE. Astfel, dacă utilizatorul reface chestionarul, i se updatează profilul vechi
+        await sequelize.query(
+            `INSERT INTO ProfilDermatologic (membruId, tipTen, alergii, probleme) 
+             VALUES (?, ?, ?, ?) 
+             ON DUPLICATE KEY UPDATE tipTen = VALUES(tipTen), alergii = VALUES(alergii), probleme = VALUES(probleme)`,
+            { replacements: [membruId, tipTen, alergii, probleme || '[]'] }
+        );
+        res.json({ mesaj: 'Profil salvat cu succes!' });
+    } catch (error) {
+        console.error("Eroare salvare profil DB:", error);
+        res.status(500).json({ eroare: 'Eroare la salvare.' });
+    }
+};
