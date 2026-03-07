@@ -5,6 +5,8 @@ import Navbar from '../components/Navbar';
 import API_URL from '../api';
 
 const CULORI_AVATAR = ['#b06090', '#6aab9e', '#e8956d', '#7b68ee', '#e91e8c', '#00897b'];
+
+function getCuloareAvatar(nume) {
   let hash = 0;
   for (let i = 0; i < (nume || '').length; i++) hash = nume.charCodeAt(i) + ((hash << 5) - hash);
   return CULORI_AVATAR[Math.abs(hash) % CULORI_AVATAR.length];
