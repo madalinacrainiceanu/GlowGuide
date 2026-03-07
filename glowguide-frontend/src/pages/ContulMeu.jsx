@@ -159,7 +159,7 @@ export default function ContulMeu() {
           </div>
 
           {/* Statistici */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+          <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
             {[
               { label: 'Intrări jurnal', value: cont?.statistici?.intrariJurnal || 0, emoji: '📔' },
               { label: 'Postări forum', value: cont?.statistici?.postariPublicate || 0, emoji: '💬' },

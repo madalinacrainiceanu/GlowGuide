@@ -80,7 +80,7 @@ export default function LandingPage() {
       </nav>
 
       {/* HERO */}
-      <section style={{ maxWidth: '1100px', margin: '0 auto', padding: '80px 24px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
+      <section className="landing-hero" style={{ maxWidth: '1100px', margin: '0 auto', padding: '80px 24px 60px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '60px', alignItems: 'center' }}>
         <div>
           <div style={{
             display: 'inline-flex', alignItems: 'center', gap: '8px',
@@ -155,7 +155,7 @@ export default function LandingPage() {
             </h2>
             <p style={{ color: '#7a7a8c', fontSize: '16px', margin: 0 }}>Trei pași simpli spre pielea ta ideală</p>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
+          <div className="steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '32px' }}>
             {PASI.map((pas, i) => (
               <div key={i} style={{ textAlign: 'center' }}>
                 <div style={{

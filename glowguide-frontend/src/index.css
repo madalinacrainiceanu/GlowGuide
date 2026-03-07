@@ -58,3 +58,39 @@ body {
 input, textarea, button {
   font-family: inherit;
 }
+
+/* ===================== RESPONSIVE MOBILE ===================== */
+@media (max-width: 600px) {
+
+  /* Grid-uri cu coloane prea late — o singură coloană pe mobil */
+  .responsive-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Statistici ContulMeu — 2 coloane pe mobil */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Landing hero — o coloană pe mobil */
+  .landing-hero {
+    grid-template-columns: 1fr !important;
+    padding: 40px 16px 32px !important;
+    gap: 32px !important;
+  }
+
+  .landing-hero h1 {
+    font-size: 32px !important;
+  }
+
+  /* Landing steps — o coloană pe mobil */
+  .steps-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  /* Chatbot — înălțime mai mică */
+  .chat-messages {
+    height: 320px !important;
+  }
+}
