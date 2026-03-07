@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 export default function RutinaMea() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function RutinaMea() {
     setLoading(true);
     setEroare('');
     try {
-      const raspuns = await axios.post('http://localhost:5000/api/rutina/genereaza', { membruId: user.id });
+      const raspuns = await axios.post(`${API_URL}/api/rutina/genereaza`, { membruId: user.id });
       const produsePrimite = raspuns.data.produse;
       const diagnosticPrimit = raspuns.data.profilUtilizator;
       const data = new Date().toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });

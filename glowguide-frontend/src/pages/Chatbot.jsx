@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 const INTREBARI_RAPIDE = [
   'În ce ordine aplic produsele?',
@@ -45,7 +46,7 @@ export default function Chatbot() {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/chatbot/intreaba', { intrebare });
+      const res = await axios.post(`${API_URL}/api/chatbot/intreaba`, { intrebare });
       setMesaje((prev) => [
         ...prev,
         { tip: 'bot', text: res.data.raspuns, categorie: res.data.categorie, sursa: res.data.sursa },

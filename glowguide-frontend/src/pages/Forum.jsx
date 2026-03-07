@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 export default function Forum() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function Forum() {
 
   const incarcaPostari = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/forum/feed?membruId=${user?.id || 0}`);
+      const res = await axios.get(`${API_URL}/api/forum/feed?membruId=${user?.id || 0}`);
       setPostari(res.data);
     } catch (e) {
       console.log('Eroare încărcare postări:', e);
@@ -33,7 +34,7 @@ export default function Forum() {
     e.preventDefault();
     setMesaj('');
     try {
-      await axios.post('http://localhost:5000/api/forum/adauga', {
+      await axios.post(`${API_URL}/api/forum/adauga`, {
         membruId: user.membruId || user.id, titlu, continut,
       });
       setMesaj('✅ Postarea ta a fost trimisă și urmează să fie aprobată!');
@@ -47,7 +48,7 @@ export default function Forum() {
   const toggleLike = async (e, postareId) => {
     e.stopPropagation();
     try {
-      const res = await axios.post(`http://localhost:5000/api/forum/${postareId}/like`, { membruId: user?.id });
+      const res = await axios.post(`${API_URL}/api/forum/${postareId}/like`, { membruId: user?.id });
       setPostari(prev => prev.map(p => p.id === postareId
         ? { ...p, numar_likeuri: res.data.likeuri, likedDeMine: res.data.likedDeMine ? 1 : 0 }
         : p
