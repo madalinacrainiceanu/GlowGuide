@@ -114,7 +114,7 @@ export default function ContulMeu() {
   );
 
   const initiala = `${cont?.prenume?.[0] || ''}${cont?.nume?.[0] || ''}`.toUpperCase() || '?';
-  const culoare = getculoareAvatar(cont?.prenume || '');
+  const culoare = getCuloareAvatar(cont?.prenume || '');
   const dataInregistrare = cont?.dataCreare ? new Date(cont.dataCreare).toLocaleDateString('ro-RO', { year: 'numeric', month: 'long', day: 'numeric' }) : '—';
 
   return (
