@@ -58,10 +58,10 @@ export default function Register() {
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#fffafb', padding: '20px' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f7f4f0', padding: '20px' }}>
       <div style={{ padding: '40px', backgroundColor: 'white', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', width: '100%', maxWidth: '420px' }}>
         
-        <h2 style={{ textAlign: 'center', color: '#d63384', marginBottom: '6px' }}>✨ GlowGuide</h2>
+        <h2 style={{ textAlign: 'center', color: '#b06090', marginBottom: '6px' }}>✨ GlowGuide</h2>
         <p style={{ textAlign: 'center', color: '#888', fontSize: '13px', marginBottom: '24px' }}>
           {pas === 1 ? 'Creează-ți contul 🌸' : `Introdu codul primit pe ${email}`}
         </p>
@@ -71,7 +71,7 @@ export default function Register() {
           {[1, 2].map(p => (
             <div key={p} style={{
               width: '32px', height: '6px', borderRadius: '3px',
-              backgroundColor: pas >= p ? '#d63384' : '#f0d0e0'
+              backgroundColor: pas >= p ? '#b06090' : '#e8d8e4'
             }} />
           ))}
         </div>
@@ -98,7 +98,7 @@ export default function Register() {
             <input type="password" placeholder="Parolă (min. 6 caractere)" value={parola} onChange={e => setParola(e.target.value)} required style={inputStyle} />
             <input type="password" placeholder="Confirmă parola" value={confirmaParola} onChange={e => setConfirmaParola(e.target.value)} required style={inputStyle} />
             <button type="submit" disabled={loading} style={{
-              padding: '12px', backgroundColor: loading ? '#f0a0c0' : '#d63384',
+              padding: '12px', backgroundColor: loading ? '#d4b0c4' : '#b06090',
               color: 'white', border: 'none', borderRadius: '8px',
               fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '15px'
             }}>
@@ -123,15 +123,15 @@ export default function Register() {
               style={{ ...inputStyle, textAlign: 'center', fontSize: '22px', fontWeight: 'bold', letterSpacing: '8px' }}
             />
             <button type="submit" disabled={loading} style={{
-              padding: '12px', backgroundColor: loading ? '#f0a0c0' : '#d63384',
+              padding: '12px', backgroundColor: loading ? '#d4b0c4' : '#b06090',
               color: 'white', border: 'none', borderRadius: '8px',
               fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '15px'
             }}>
               {loading ? 'Se verifică...' : 'Verifică și creează cont ✅'}
             </button>
             <button type="button" onClick={() => { setPas(1); setEroare(''); setSucces(''); }} style={{
-              padding: '10px', backgroundColor: 'transparent', color: '#d63384',
-              border: '1px solid #d63384', borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
+              padding: '10px', backgroundColor: 'transparent', color: '#b06090',
+              border: '1px solid #b06090', borderRadius: '8px', cursor: 'pointer', fontSize: '13px'
             }}>
               ← Înapoi (schimbă datele)
             </button>
@@ -140,7 +140,7 @@ export default function Register() {
 
         <p style={{ textAlign: 'center', marginTop: '20px', fontSize: '14px', color: '#666' }}>
           Ai deja cont?{' '}
-          <Link to="/" style={{ color: '#d63384', fontWeight: 'bold', textDecoration: 'none' }}>
+          <Link to="/login" style={{ color: '#b06090', fontWeight: 'bold', textDecoration: 'none' }}>
             Intră în cont
           </Link>
         </p>

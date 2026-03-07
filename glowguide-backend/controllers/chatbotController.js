@@ -3,6 +3,15 @@ const OpenAI = require('openai');
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// Normalizează diacriticele pentru comparații mai robuste
+const normalizeaza = (str) => str
+    .toLowerCase()
+    .replace(/[?!.,]/g, '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '') // elimină diacritice
+    .replace(/ș|ş/g, 's').replace(/ț|ţ/g, 't')
+    .replace(/ă/g, 'a').replace(/â|î/g, 'i');
+
 exports.intreaba = async (req, res) => {
     const { intrebare } = req.body;
 
@@ -11,20 +20,19 @@ exports.intreaba = async (req, res) => {
     }
 
     try {
-        // STRATEGIA 1: Căutare exactă în cuvinteCheie (cea mai precisă)
-        const cuvinte = intrebare.toLowerCase()
-            .replace(/[?!.,]/g, '')
+        const intrebareNorm = normalizeaza(intrebare);
+        const cuvinte = intrebareNorm
             .split(' ')
             .filter(c => c.length > 3 && !['este', 'sunt', 'care', 'cum', 'face', 'faci', 'poti', 'trebuie', 'pentru', 'despre', 'folosesc'].includes(c));
 
+        // STRATEGIA 1: Căutare după cuvinteCheie cu scor
         if (cuvinte.length > 0) {
-            // Construim scor: câte cuvinte cheie se potrivesc
-            const conditii = cuvinte.map(() => 'cuvinteCheie LIKE ?').join(' OR ');
+            const conditii = cuvinte.map(() => 'LOWER(cuvinteCheie) LIKE ?').join(' OR ');
             const valori = cuvinte.map(c => `%${c}%`);
 
             const [rezultateCK] = await sequelize.query(
                 `SELECT id, raspuns, categorie, numarAfisari,
-                    (${cuvinte.map(() => '(CASE WHEN cuvinteCheie LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor
+                    (${cuvinte.map(() => '(CASE WHEN LOWER(cuvinteCheie) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor
                  FROM FAQ
                  WHERE ${conditii}
                  ORDER BY scor DESC, numarAfisari DESC
@@ -32,8 +40,7 @@ exports.intreaba = async (req, res) => {
                 { replacements: [...valori, ...valori] }
             );
 
-            // Scor minim = cel puțin 2 cuvinte cheie potrivite SAU 1 cuvânt specific (>5 litere)
-            const scorMinim = cuvinte.some(c => c.length > 5) ? 1 : 2;
+            const scorMinim = cuvinte.length >= 2 ? 2 : 1;
 
             if (rezultateCK.length > 0 && rezultateCK[0].scor >= scorMinim) {
                 await sequelize.query(
@@ -48,8 +55,38 @@ exports.intreaba = async (req, res) => {
             }
         }
 
-        // STRATEGIA 2: Fallback OpenAI (dacă BD nu a găsit ceva relevant)
-        if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'sk-aici_pui_cheia_ta') {
+        // STRATEGIA 2: Căutare LIKE directă pe câmpul intrebare (fallback FAQ)
+        if (cuvinte.length > 0) {
+            const conditiiIntrebare = cuvinte.map(() => 'LOWER(intrebare) LIKE ?').join(' OR ');
+            const valoriIntrebare = cuvinte.map(c => `%${c}%`);
+
+            const [rezultateInt] = await sequelize.query(
+                `SELECT id, raspuns, categorie,
+                    (${cuvinte.map(() => '(CASE WHEN LOWER(intrebare) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor
+                 FROM FAQ
+                 WHERE ${conditiiIntrebare}
+                 ORDER BY scor DESC, numarAfisari DESC
+                 LIMIT 1`,
+                { replacements: [...valoriIntrebare, ...valoriIntrebare] }
+            );
+
+            const scorMinim2 = cuvinte.length >= 2 ? 2 : 1;
+
+            if (rezultateInt.length > 0 && rezultateInt[0].scor >= scorMinim2) {
+                await sequelize.query(
+                    'UPDATE FAQ SET numarAfisari = numarAfisari + 1 WHERE id = ?',
+                    { replacements: [rezultateInt[0].id] }
+                );
+                return res.json({
+                    raspuns: rezultateInt[0].raspuns,
+                    categorie: rezultateInt[0].categorie,
+                    sursa: 'faq'
+                });
+            }
+        }
+
+        // STRATEGIA 3: Fallback OpenAI
+        if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'sk-aici_pui_cheia_ta' && !process.env.OPENAI_API_KEY.includes('pune_')) {
             try {
                 const completion = await openai.chat.completions.create({
                     model: 'gpt-3.5-turbo',
@@ -71,11 +108,10 @@ exports.intreaba = async (req, res) => {
                 });
             } catch (openaiError) {
                 console.error('OpenAI error:', openaiError.message);
-                // Dacă OpenAI eșuează, continuăm cu fallback-ul de mai jos
             }
         }
 
-        // Fallback final dacă nu există API key
+        // Fallback final
         res.json({
             raspuns: 'Hmm, nu am găsit un răspuns specific pentru asta în baza mea de date. Încearcă să reformulezi întrebarea sau întreabă despre un ingredient specific (ex: "niacinamide", "retinol", "acid hialuronic").',
             categorie: 'general',

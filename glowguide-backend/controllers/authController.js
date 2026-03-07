@@ -192,6 +192,132 @@ exports.register = async (req, res) => {
     }
 };
 
+// --- PROFIL PUBLIC UTILIZATOR ---
+exports.getProfilPublic = async (req, res) => {
+    const { membruId } = req.params;
+    try {
+        const [rows] = await sequelize.query(
+            `SELECT m.id, m.prenume, m.nume,
+                    COUNT(DISTINCT p.id) AS postariPublicate,
+                    COUNT(DISTINCT j.id) AS intrariJurnal
+             FROM Membru m
+             JOIN Utilizator u ON m.utilizatorId = u.id
+             LEFT JOIN Postare p ON p.membruId = m.id AND p.status = 'publicata'
+             LEFT JOIN JurnalProgres j ON j.membruId = m.id
+             WHERE m.id = ?
+             GROUP BY m.id`,
+            { replacements: [membruId] }
+        );
+        if (rows.length === 0) return res.status(404).json({ eroare: 'Utilizatorul nu există.' });
+
+        const [postari] = await sequelize.query(
+            `SELECT p.id, p.titlu, p.dataPostare, COUNT(r.id) AS numar_raspunsuri
+             FROM Postare p
+             LEFT JOIN RaspunsPostare r ON r.postareId = p.id
+             WHERE p.membruId = ? AND p.status = 'publicata'
+             GROUP BY p.id ORDER BY p.dataPostare DESC LIMIT 10`,
+            { replacements: [membruId] }
+        );
+
+        res.json({ ...rows[0], postari });
+    } catch (error) {
+        res.status(500).json({ eroare: 'Eroare la încărcarea profilului.' });
+    }
+};
+
+// --- GET DETALII CONT + STATISTICI ---
+exports.getContMeu = async (req, res) => {
+    const { membruId } = req.params;
+    try {
+        const [rows] = await sequelize.query(
+            `SELECT u.id AS utilizatorId, u.email, u.rol,
+                    m.id AS membruId, m.nume, m.prenume
+             FROM Membru m
+             JOIN Utilizator u ON m.utilizatorId = u.id
+             WHERE m.id = ?`,
+            { replacements: [membruId] }
+        );
+        if (rows.length === 0) return res.status(404).json({ eroare: 'Utilizatorul nu a fost găsit.' });
+
+        const [stats] = await sequelize.query(
+            `SELECT 
+                (SELECT COUNT(*) FROM JurnalProgres WHERE membruId = ?) AS intrariJurnal,
+                (SELECT COUNT(*) FROM Postare WHERE membruId = ? AND status = 'publicata') AS postariPublicate,
+                (SELECT MAX(dataIntrare) FROM JurnalProgres WHERE membruId = ?) AS ultimaIntrareJurnal`,
+            { replacements: [membruId, membruId, membruId] }
+        );
+
+        res.json({ ...rows[0], statistici: stats[0] });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ eroare: 'Eroare la preluarea datelor contului.' });
+    }
+};
+
+// --- EDITARE NUME ---
+exports.editareNume = async (req, res) => {
+    const { membruId, numeNou, prenumeNou } = req.body;
+    try {
+        await sequelize.query(
+            'UPDATE Membru SET nume = ?, prenume = ? WHERE id = ?',
+            { replacements: [numeNou, prenumeNou, membruId] }
+        );
+        res.json({ mesaj: 'Numele a fost actualizat cu succes!' });
+    } catch (error) {
+        res.status(500).json({ eroare: 'Eroare la actualizarea numelui.' });
+    }
+};
+
+// --- SCHIMBĂ PAROLA ---
+exports.schimbaParola = async (req, res) => {
+    const { membruId, parolaVeche, parolaNoua } = req.body;
+    try {
+        const [rows] = await sequelize.query(
+            'SELECT u.parola FROM Utilizator u JOIN Membru m ON u.id = m.utilizatorId WHERE m.id = ?',
+            { replacements: [membruId] }
+        );
+        if (rows.length === 0) return res.status(404).json({ eroare: 'Utilizatorul nu există.' });
+
+        const potrivire = await bcrypt.compare(parolaVeche, rows[0].parola);
+        if (!potrivire) return res.status(400).json({ eroare: 'Parola actuală este incorectă.' });
+
+        const salt = await bcrypt.genSalt(10);
+        const parolaHash = await bcrypt.hash(parolaNoua, salt);
+
+        await sequelize.query(
+            'UPDATE Utilizator u JOIN Membru m ON u.id = m.utilizatorId SET u.parola = ? WHERE m.id = ?',
+            { replacements: [parolaHash, membruId] }
+        );
+        res.json({ mesaj: 'Parola a fost schimbată cu succes!' });
+    } catch (error) {
+        res.status(500).json({ eroare: 'Eroare la schimbarea parolei.' });
+    }
+};
+
+// --- ȘTERGERE CONT ---
+exports.stergeCont = async (req, res) => {
+    const { membruId } = req.body;
+    try {
+        // Ștergem datele asociate
+        await sequelize.query('DELETE FROM JurnalProgres WHERE membruId = ?', { replacements: [membruId] });
+        await sequelize.query('DELETE FROM Postare WHERE membruId = ?', { replacements: [membruId] });
+        await sequelize.query('DELETE FROM ProfilDermatologic WHERE membruId = ?', { replacements: [membruId] });
+
+        // Găsim utilizatorId
+        const [rows] = await sequelize.query('SELECT utilizatorId FROM Membru WHERE id = ?', { replacements: [membruId] });
+        if (rows.length === 0) return res.status(404).json({ eroare: 'Utilizatorul nu există.' });
+        const utilizatorId = rows[0].utilizatorId;
+
+        await sequelize.query('DELETE FROM Membru WHERE id = ?', { replacements: [membruId] });
+        await sequelize.query('DELETE FROM Utilizator WHERE id = ?', { replacements: [utilizatorId] });
+
+        res.json({ mesaj: 'Contul a fost șters.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ eroare: 'Eroare la ștergerea contului.' });
+    }
+};
+
 // --- AUTENTIFICARE (LOGIN) ---
 exports.login = async (req, res) => {
     const { email, parola } = req.body;
@@ -199,7 +325,7 @@ exports.login = async (req, res) => {
     try {
         // 1. Căutăm utilizatorul în BD, făcând JOIN cu Membru pentru a lua ID-ul corect
         const [users] = await sequelize.query(
-            `SELECT u.id AS utilizatorId, u.email, u.parola, u.rol, m.id AS membruId 
+            `SELECT u.id AS utilizatorId, u.email, u.parola, u.rol, m.id AS membruId, m.prenume, m.nume
              FROM Utilizator u 
              LEFT JOIN Membru m ON u.id = m.utilizatorId 
              WHERE u.email = ?`,
@@ -232,7 +358,9 @@ exports.login = async (req, res) => {
             user: { 
                 id: user.membruId, 
                 email: user.email, 
-                rol: user.rol 
+                rol: user.rol,
+                prenume: user.prenume,
+                nume: user.nume
             }
         });
 

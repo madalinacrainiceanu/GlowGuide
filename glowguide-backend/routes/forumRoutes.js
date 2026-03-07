@@ -4,11 +4,13 @@ const forumController = require('../controllers/forumController');
 
 // Rute pt Admin (Moderare) — TREBUIE înainte de /:id !
 router.get('/admin/in-asteptare', forumController.getPostariInAsteptare);
+router.get('/admin/numar-asteptare', forumController.numarInAsteptare);
 router.put('/admin/moderare/:id', forumController.modereazaPostare);
 
 // Rute pt Membri
 router.post('/adauga', forumController.creeazaPostare);
 router.get('/feed', forumController.getPostariPublicate);
+router.post('/:postareId/like', forumController.toggleLike);
 router.post('/:postareId/reply', forumController.adaugaReply);
 router.get('/:id', forumController.getPostareCuReplies);
 

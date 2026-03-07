@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import Navbar from '../components/Navbar';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
@@ -39,10 +40,10 @@ export default function Jurnal() {
                 datasets: [{
                     label: 'Evoluția Tenului (Nota Medie)',
                     data: dateBackend.map(item => parseFloat(item.rating_mediu)),
-                    borderColor: '#d63384',
-                    backgroundColor: 'rgba(214, 51, 132, 0.15)',
+                    borderColor: '#6aab9e',
+                    backgroundColor: 'rgba(106, 171, 158, 0.12)',
                     pointBackgroundColor: '#fff',
-                    pointBorderColor: '#d63384',
+                    pointBorderColor: '#6aab9e',
                     tension: 0.4,
                     fill: true
                 }]
@@ -130,74 +131,108 @@ export default function Jurnal() {
   };
 
   return (
-    <div style={{ padding: '40px 20px', maxWidth: '900px', margin: '0 auto', fontFamily: "'Inter', sans-serif" }}>
-      
-      {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <div>
-            <h1 style={{ color: '#d63384', margin: 0 }}>📖 Jurnalul Meu</h1>
-        </div>
-        <button onClick={() => navigate('/dashboard')} style={{ padding: '10px 20px', backgroundColor: '#f1f1f1', color: '#333', border: 'none', borderRadius: '25px', cursor: 'pointer', fontWeight: 'bold'}}>
-          ← Înapoi la Dashboard
-        </button>
-      </div>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+      <Navbar />
+      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 20px' }}>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '30px' }}>
+        {/* HEADER */}
+        <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>📔 Jurnalul Meu</h1>
+            <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>Urmărește evoluția tenului și notează observațiile zilnice</p>
+          </div>
+          <a
+            href={`http://localhost:5000/api/jurnal/export-csv/${user?.id}`}
+            download="jurnal_glowguide.csv"
+            style={{
+              padding: '9px 18px', backgroundColor: 'white', color: '#6aab9e',
+              border: '1.5px solid #6aab9e', borderRadius: '10px',
+              fontSize: '13px', fontWeight: '600', textDecoration: 'none',
+              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+            }}
+          >
+            📥 Export CSV
+          </a>
+        </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '24px' }}>
           
           {/* FORMULAR ADAUGARE */}
-          <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ marginBottom: '20px' }}>Scrie o filă nouă</h3>
-              <form onSubmit={adaugaIntrare} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+              <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>✍️ Scrie o filă nouă</h3>
+              <form onSubmit={adaugaIntrare} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
-                  <label style={{ fontWeight: '600', display: 'flex', justifyContent: 'space-between' }}>
-                  Starea tenului: <span style={{color: '#d63384', fontSize: '18px', fontWeight: 'bold'}}>{rating} / 10</span>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', justifyContent: 'space-between' }}>
+                    Starea tenului
+                    <span style={{ color: '#b06090', fontSize: '16px', fontWeight: '800' }}>{rating}/10</span>
                   </label>
-                  <input type="range" min="1" max="10" value={rating} onChange={(e) => setRating(parseInt(e.target.value))} style={{ width: '100%', marginTop: '10px' }} />
+                  <input type="range" min="1" max="10" value={rating} onChange={(e) => setRating(parseInt(e.target.value))}
+                    style={{ width: '100%', marginTop: '10px', accentColor: '#b06090' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: '#aaa', marginTop: '4px' }}>
+                    <span>😔 Slab</span><span>😊 Excelent</span>
+                  </div>
               </div>
               <div>
-                  <label style={{ fontWeight: '600', display: 'block', marginBottom: '10px' }}>Gândurile tale:</label>
-                  <textarea value={observatii} onChange={(e) => setObservatii(e.target.value)} rows="4" style={{ width: '100%', padding: '15px', borderRadius: '12px', border: '1px solid #e0e0e0', resize: 'vertical' }} required />
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>Observații</label>
+                  <textarea value={observatii} onChange={(e) => setObservatii(e.target.value)} rows="4"
+                    placeholder="Cum arată tenul azi? Ce produse ai folosit?"
+                    style={{ width: '100%', padding: '12px 14px', borderRadius: '10px', border: '1.5px solid #e5e7eb', resize: 'vertical', fontSize: '14px', boxSizing: 'border-box', fontFamily: 'inherit', outline: 'none' }}
+                    onFocus={e => e.target.style.borderColor = '#b06090'}
+                    onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                    required />
               </div>
-              <button type="submit" style={{ padding: '15px', backgroundColor: '#d63384', color: 'white', border: 'none', borderRadius: '12px', fontWeight: 'bold', fontSize: '16px', cursor: 'pointer' }}>
+              <button type="submit" style={{
+                padding: '13px', background: 'linear-gradient(135deg, #b06090, #6aab9e)',
+                color: 'white', border: 'none', borderRadius: '10px',
+                fontWeight: '700', fontSize: '15px', cursor: 'pointer',
+                boxShadow: '0 4px 15px rgba(176,96,144,0.25)'
+              }}>
                   ✨ Salvează în Jurnal
               </button>
               </form>
-              {mesaj && <div style={{ marginTop: '15px', padding: '10px', backgroundColor: '#e8f5e9', color: '#2e7d32', borderRadius: '8px', textAlign: 'center', fontWeight: 'bold' }}>{mesaj}</div>}
+              {mesaj && <div style={{ marginTop: '14px', padding: '12px', backgroundColor: mesaj.includes('✅') ? '#f0fdf4' : '#fff5f5', color: mesaj.includes('✅') ? '#16a34a' : '#dc2626', borderRadius: '10px', textAlign: 'center', fontWeight: '600', fontSize: '13px' }}>{mesaj}</div>}
           </div>
 
           {/* GRAFIC */}
-          <div style={{ backgroundColor: 'white', padding: '30px', borderRadius: '20px', boxShadow: '0 10px 30px rgba(0,0,0,0.05)' }}>
-              <h3 style={{ marginBottom: '20px' }}>Evoluție Ten</h3>
+          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+              <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>📈 Evoluție Ten</h3>
               {dateGrafic ? (
-              <div style={{ width: '100%', height: '280px' }}>
-                  <Line ref={chartRef} options={{responsive: true, maintainAspectRatio: false, scales: {y: { min: 0, max: 10 }}}} data={dateGrafic} />
+              <div style={{ width: '100%', height: '260px' }}>
+                  <Line ref={chartRef} options={{ responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 10, grid: { color: '#f5f5f5' } } }, plugins: { legend: { display: false } } }} data={dateGrafic} />
               </div>
               ) : (
-              <div style={{ height: '280px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
-                  Adaugă note în jurnal pentru a genera graficul.
+              <div style={{ height: '260px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#bbb' }}>
+                  <div style={{ fontSize: '48px', marginBottom: '12px' }}>📊</div>
+                  <p style={{ margin: 0, fontSize: '14px' }}>Adaugă note pentru a genera graficul</p>
               </div>
               )}
           </div>
       </div>
 
-      {/* AGENDA CU EDITARE SI STERGERE */}
-      <div style={{ marginTop: '40px' }}>
-          <h2 style={{ color: '#333', marginBottom: '20px' }}>📚 Filele Jurnalului Tău</h2>
+      {/* AGENDA */}
+      <div style={{ marginTop: '32px' }}>
+          <h2 style={{ color: '#222', marginBottom: '20px', fontSize: '18px' }}>📚 Filele Jurnalului</h2>
           
           {istoric.length === 0 ? (
-              <p style={{ color: '#666', fontStyle: 'italic' }}>Jurnalul este gol momentan. Adaugă o notă mai sus!</p>
+              <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '20px', textAlign: 'center', color: '#bbb', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+                <div style={{ fontSize: '48px', marginBottom: '12px' }}>📝</div>
+                <p style={{ margin: 0 }}>Jurnalul este gol. Adaugă prima notă mai sus!</p>
+              </div>
           ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {istoric.map((intrare) => (
                       <div key={intrare.id} style={{ 
-                          backgroundColor: '#fffdf9', border: '1px solid #f0e6d2', borderLeft: '6px solid #d63384', borderRadius: '12px', padding: '25px', boxShadow: '0 4px 10px rgba(0,0,0,0.03)'
+                          backgroundColor: 'white', borderLeft: '4px solid #b06090',
+                          borderRadius: '14px', padding: '22px 24px',
+                          boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
                       }}>
                           {/* MODUL EDITARE */}
                           {editareId === intrare.id ? (
                               <div style={{display: 'flex', flexDirection: 'column', gap: '15px'}}>
                                   <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                                      <strong>Modifică nota: <span style={{color:'#d63384'}}>{ratingEdit}</span></strong>
-                                      <input type="range" min="1" max="10" value={ratingEdit} onChange={(e) => setRatingEdit(parseInt(e.target.value))} style={{width: '60%'}}/>
+                                      <strong>Modifică nota: <span style={{color:'#b06090'}}>{ratingEdit}</span></strong>
+                                      <input type="range" min="1" max="10" value={ratingEdit} onChange={(e) => setRatingEdit(parseInt(e.target.value))} style={{width: '60%', accentColor: '#b06090'}}/>
                                   </div>
                                   <textarea value={observatiiEdit} onChange={(e) => setObservatiiEdit(e.target.value)} rows="3" style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc'}} />
                                   
@@ -214,15 +249,17 @@ export default function Jurnal() {
                                           📅 {formateazaData(intrare.dataIntrare)}
                                       </span>
                                       
-                                      <div style={{display: 'flex', alignItems: 'center', gap: '15px'}}>
+                                      <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
                                           <button onClick={() => pornesteEditare(intrare)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px'}} title="Editează">✏️</button>
                                           <button onClick={() => stergeNota(intrare.id)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px'}} title="Șterge">🗑️</button>
-                                          
                                           <span style={{ 
-                                              backgroundColor: intrare.rating >= 7 ? '#e8f5e9' : intrare.rating <= 4 ? '#ffebee' : '#fff3e0',
-                                              color: intrare.rating >= 7 ? '#2e7d32' : intrare.rating <= 4 ? '#c62828' : '#ef6c00',
-                                              padding: '5px 12px', borderRadius: '20px', fontWeight: 'bold', fontSize: '14px'
-                                          }}>Nota: {intrare.rating} / 10</span>
+                                              backgroundColor: intrare.rating >= 7 ? '#eef6f4' : intrare.rating <= 4 ? '#ffebee' : '#fff8e1',
+                                              color: intrare.rating >= 7 ? '#4a897e' : intrare.rating <= 4 ? '#c62828' : '#b5622a',
+                                              padding: '4px 12px', borderRadius: '20px', fontWeight: '700', fontSize: '13px',
+                                              display: 'flex', alignItems: 'center', gap: '4px'
+                                          }}>
+                                            {intrare.rating >= 7 ? '🟢' : intrare.rating <= 4 ? '🔴' : '🟡'} {intrare.rating}/10
+                                          </span>
                                       </div>
                                   </div>
                                   <p style={{ margin: 0, color: '#444', fontSize: '17px', fontStyle: 'italic', fontFamily: "'Georgia', serif" }}>
@@ -236,6 +273,7 @@ export default function Jurnal() {
           )}
       </div>
 
+    </div>
     </div>
   );
 }

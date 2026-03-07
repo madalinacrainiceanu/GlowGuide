@@ -12,6 +12,7 @@ router.get('/istoric/:id', jurnalController.getIstoricJurnal);
 // Rutele noi de stergere si editare
 router.delete('/sterge/:notaId', jurnalController.stergeIntrare);
 router.put('/editeaza/:notaId', jurnalController.editeazaIntrare);
+router.get('/export-csv/:id', jurnalController.exportCSV);
 
 
 module.exports = router;

@@ -1,4 +1,10 @@
 const sequelize = require('../db');
+const nodemailer = require('nodemailer');
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+});
 
 // --- PENTRU MEMBRI ---
 
@@ -22,18 +28,21 @@ exports.creeazaPostare = async (req, res) => {
 
 // 2. Afișare toate postările PUBLICATE (pentru Feed-ul comunității)
 exports.getPostariPublicate = async (req, res) => {
+    const { membruId } = req.query;
     try {
-        // Query-ul de aici aduce postarea + numărul de replies (folosind LEFT JOIN)
         const [postari] = await sequelize.query(`
-            SELECT p.id, p.titlu, p.continut, p.dataPostare, m.nume AS autor, 
-                   COUNT(r.id) AS numar_raspunsuri
+            SELECT p.id, p.titlu, p.continut, p.dataPostare, p.membruId, m.nume AS autor, 
+                   COUNT(DISTINCT r.id) AS numar_raspunsuri,
+                   COUNT(DISTINCT l.id) AS numar_likeuri,
+                   MAX(CASE WHEN l.membruId = ? THEN 1 ELSE 0 END) AS likedDeMine
             FROM Postare p
             JOIN Membru m ON p.membruId = m.id
             LEFT JOIN RaspunsPostare r ON p.id = r.postareId
+            LEFT JOIN LikePostare l ON p.id = l.postareId
             WHERE p.status = 'publicata'
             GROUP BY p.id
             ORDER BY p.dataPostare DESC
-        `);
+        `, { replacements: [membruId || 0] });
 
         res.json(postari);
     } catch (error) {
@@ -105,10 +114,43 @@ exports.getPostariInAsteptare = async (req, res) => {
     }
 };
 
-// 6. Aprobare sau Respingere postare (Moderare)
-exports.modereazaPostare= async (req, res) => {
+// 7. Număr postări în așteptare (pentru badge admin în Navbar)
+exports.numarInAsteptare = async (req, res) => {
+    try {
+        const [result] = await sequelize.query(
+            `SELECT COUNT(*) AS numar FROM Postare WHERE status = 'in_asteptare'`
+        );
+        res.json({ numar: result[0].numar });
+    } catch (error) {
+        res.status(500).json({ eroare: 'Eroare.' });
+    }
+};
+
+// 8. Toggle like pe postare
+exports.toggleLike = async (req, res) => {
+    const { postareId } = req.params;
+    const { membruId } = req.body;
+    try {
+        const [existing] = await sequelize.query(
+            'SELECT id FROM LikePostare WHERE postareId = ? AND membruId = ?',
+            { replacements: [postareId, membruId] }
+        );
+        if (existing.length > 0) {
+            await sequelize.query('DELETE FROM LikePostare WHERE postareId = ? AND membruId = ?', { replacements: [postareId, membruId] });
+        } else {
+            await sequelize.query('INSERT INTO LikePostare (postareId, membruId) VALUES (?, ?)', { replacements: [postareId, membruId] });
+        }
+        const [count] = await sequelize.query('SELECT COUNT(*) AS total FROM LikePostare WHERE postareId = ?', { replacements: [postareId] });
+        res.json({ likeuri: count[0].total, likedDeMine: existing.length === 0 });
+    } catch (error) {
+        res.status(500).json({ eroare: 'Eroare la like.' });
+    }
+};
+
+// 6. Aprobare sau Respingere postare (Moderare) + email notificare
+exports.modereazaPostare = async (req, res) => {
     const { id } = req.params;
-    const { actiune } = req.body; // Trebuie să fie 'publicata' sau 'respinsa'
+    const { actiune } = req.body;
 
     if (!['publicata', 'respinsa'].includes(actiune)) {
         return res.status(400).json({ eroare: 'Acțiune invalidă.' });
@@ -119,6 +161,40 @@ exports.modereazaPostare= async (req, res) => {
             `UPDATE Postare SET status = ? WHERE id = ?`,
             { replacements: [actiune, id] }
         );
+
+        // Trimite email de notificare autorului
+        if (actiune === 'publicata') {
+            const [rows] = await sequelize.query(
+                `SELECT p.titlu, m.prenume, u.email 
+                 FROM Postare p 
+                 JOIN Membru m ON p.membruId = m.id 
+                 JOIN Utilizator u ON m.utilizatorId = u.id 
+                 WHERE p.id = ?`,
+                { replacements: [id] }
+            );
+            if (rows.length > 0) {
+                const { titlu, prenume, email } = rows[0];
+                transporter.sendMail({
+                    from: `"GlowGuide 🌸" <${process.env.EMAIL_USER}>`,
+                    to: email,
+                    subject: '✅ Postarea ta a fost aprobată!',
+                    html: `
+                        <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; background: #fffafb; border-radius: 15px;">
+                            <h2 style="color: #b06090; text-align: center;">🌸 GlowGuide</h2>
+                            <p>Bună, <strong>${prenume}</strong>!</p>
+                            <p>Postarea ta <strong>"${titlu}"</strong> a fost aprobată și este acum vizibilă în comunitate! 🎉</p>
+                            <div style="text-align: center; margin: 24px 0;">
+                                <a href="http://localhost:5173/forum" style="background: linear-gradient(135deg, #b06090, #6aab9e); color: white; padding: 12px 28px; border-radius: 10px; text-decoration: none; font-weight: bold;">
+                                    Vezi postarea →
+                                </a>
+                            </div>
+                            <p style="color: #888; font-size: 13px;">Echipa GlowGuide 💕</p>
+                        </div>
+                    `
+                }).catch(e => console.error('Email notificare:', e.message));
+            }
+        }
+
         res.json({ mesaj: `Postarea a fost ${actiune} cu succes!` });
     } catch (error) {
         res.status(500).json({ eroare: 'Eroare la moderare.' });

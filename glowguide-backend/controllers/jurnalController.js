@@ -134,3 +134,25 @@ exports.editeazaIntrare = async (req, res) => {
     }
 };
 
+exports.exportCSV = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [intrari] = await sequelize.query(
+            `SELECT dataIntrare, rating, observatii FROM JurnalProgres WHERE membruId = ? ORDER BY dataIntrare ASC`,
+            { replacements: [id] }
+        );
+        const header = 'Data,Rating,Observatii\n';
+        const randuri = intrari.map(r => {
+            const data = r.dataIntrare ? String(r.dataIntrare).substring(0, 10) : '';
+            const obs = (r.observatii || '').replace(/"/g, '""');
+            return `${data},${r.rating},"${obs}"`;
+        }).join('\n');
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', 'attachment; filename="jurnal_glowguide.csv"');
+        res.send('\uFEFF' + header + randuri); // BOM pentru Excel
+    } catch (error) {
+        res.status(500).json({ eroare: 'Eroare la export.' });
+    }
+};
+
+

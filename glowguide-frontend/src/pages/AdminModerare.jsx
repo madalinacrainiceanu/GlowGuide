@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../components/Navbar';
 
 export default function AdminModerare() {
   const navigate = useNavigate();
@@ -55,18 +56,15 @@ export default function AdminModerare() {
   if (!user || user.rol !== 'admin') return null;
 
   return (
-    <div style={{ padding: '40px 20px', maxWidth: '850px', margin: '0 auto', fontFamily: "'Inter', sans-serif" }}>
+    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+      <Navbar />
+      <div style={{ maxWidth: '850px', margin: '0 auto', padding: '32px 20px' }}>
 
-      {/* HEADER */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' }}>
-        <div>
-          <h1 style={{ color: '#d63384', margin: 0 }}>🛡️ Panou Admin — Moderare Forum</h1>
-          <p style={{ color: '#888', margin: '5px 0 0 0' }}>Aprobă sau respinge postările trimise de utilizatori</p>
+        {/* HEADER */}
+        <div style={{ marginBottom: '28px' }}>
+          <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>🛡️ Panou Admin — Moderare Forum</h1>
+          <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>Aprobă sau respinge postările trimise de utilizatori</p>
         </div>
-        <button onClick={() => navigate('/dashboard')} style={{ padding: '10px 20px', backgroundColor: '#f1f1f1', color: '#333', border: 'none', borderRadius: '25px', cursor: 'pointer', fontWeight: 'bold' }}>
-          ← Dashboard
-        </button>
-      </div>
 
       {/* CONȚINUT */}
       {loading ? (
@@ -79,7 +77,7 @@ export default function AdminModerare() {
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           <p style={{ color: '#666', margin: 0 }}>
-            <strong style={{ color: '#d63384' }}>{postariInAsteptare.length}</strong> postare{postariInAsteptare.length !== 1 ? 'i' : ''} în așteptare
+            <strong style={{ color: '#b06090' }}>{postariInAsteptare.length}</strong> postare{postariInAsteptare.length !== 1 ? 'i' : ''} în așteptare
           </p>
           {postariInAsteptare.map((postare) => (
             <div key={postare.id} style={{ backgroundColor: 'white', padding: '25px', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.06)', borderLeft: '5px solid #ffc107' }}>
@@ -120,6 +118,7 @@ export default function AdminModerare() {
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }

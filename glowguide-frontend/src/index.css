@@ -2,9 +2,59 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
+
+:root {
+  --bg: #f7f4f0;
+  --surface: #ffffff;
+  --primary: #b06090;
+  --primary-dark: #8f4d74;
+  --primary-light: #f7eef4;
+  --mint: #6aab9e;
+  --peach: #e8956d;
+  --blue: #6aaad4;
+  --text: #2d3142;
+  --text-muted: #7a7a8c;
+  --border: #e8e3dc;
+  --shadow: rgba(45, 49, 66, 0.07);
+}
+
+/* Dark mode global */
+[data-theme='dark'] {
+  --bg: #1a1a2e;
+  --surface: #16213e;
+  --text: #e8e8f0;
+  --text-muted: #9999bb;
+  --border: #2a2a4a;
+  --shadow: rgba(0, 0, 0, 0.3);
+  --primary-light: #2a1a30;
+}
+
+[data-theme='dark'] body,
+[data-theme='dark'] {
+  background-color: var(--bg);
+  color: var(--text);
+}
+
+[data-theme='dark'] input,
+[data-theme='dark'] textarea {
+  background-color: #0f3460 !important;
+  color: #e8e8f0 !important;
+  border-color: #2a2a4a !important;
+}
+
+[data-theme='dark'] input::placeholder,
+[data-theme='dark'] textarea::placeholder {
+  color: #7777aa !important;
+}
+
 body {
-  background-color: #fffafb; /* Un roz extrem de pal, elegant */
-  color: #333;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+input, textarea, button {
+  font-family: inherit;
 }
