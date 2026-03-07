@@ -22,7 +22,7 @@ exports.trimiteCodum = async (req, res) => {
     try {
         // Verificăm dacă email-ul există deja
         const [userExistent] = await sequelize.query(
-            'SELECT * FROM Utilizator WHERE email = ?',
+            'SELECT * FROM utilizator WHERE email = ?',
             { replacements: [email] }
         );
         if (userExistent.length > 0) {
@@ -91,16 +91,16 @@ exports.verificaCod = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const parolaHash = await bcrypt.hash(parola, salt);
 
-        // Inserare Utilizator
+        // Inserare utilizator
         const [resultUtilizator] = await sequelize.query(
-            `INSERT INTO Utilizator (email, parola, rol) VALUES (?, ?, 'membru')`,
+            `INSERT INTO utilizator (email, parola, rol) VALUES (?, ?, 'membru')`,
             { replacements: [email, parolaHash] }
         );
         const utilizatorId = resultUtilizator;
 
-        // Inserare Membru
+        // Inserare membru
         await sequelize.query(
-            `INSERT INTO Membru (utilizatorId, nume, prenume) VALUES (?, ?, ?)`,
+            `INSERT INTO membru (utilizatorId, nume, prenume) VALUES (?, ?, ?)`,
             { replacements: [utilizatorId, nume, prenume] }
         );
 
@@ -121,7 +121,7 @@ exports.register = async (req, res) => {
 
     try {
         const [userExistent] = await sequelize.query(
-            'SELECT * FROM Utilizator WHERE email = ?',
+            'SELECT * FROM utilizator WHERE email = ?',
             { replacements: [email] }
         );
 
@@ -133,13 +133,13 @@ exports.register = async (req, res) => {
         const parolaHash = await bcrypt.hash(parola, salt);
 
         const [resultUtilizator] = await sequelize.query(
-            `INSERT INTO Utilizator (email, parola, rol) VALUES (?, ?, 'membru')`,
+            `INSERT INTO utilizator (email, parola, rol) VALUES (?, ?, 'membru')`,
             { replacements: [email, parolaHash] }
         );
         const utilizatorId = resultUtilizator;
 
         await sequelize.query(
-            `INSERT INTO Membru (utilizatorId, nume, prenume) VALUES (?, ?, ?)`,
+            `INSERT INTO membru (utilizatorId, nume, prenume) VALUES (?, ?, ?)`,
             { replacements: [utilizatorId, nume, prenume] }
         );
 
@@ -159,7 +159,7 @@ exports.register = async (req, res) => {
     try {
         // 1. Verificăm dacă email-ul există deja
         const [userExistent] = await sequelize.query(
-            'SELECT * FROM Utilizator WHERE email = ?',
+            'SELECT * FROM utilizator WHERE email = ?',
             { replacements: [email] }
         );
 
@@ -171,16 +171,16 @@ exports.register = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         const parolaHash = await bcrypt.hash(parola, salt);
 
-        // 3. Inserare în tabelul Utilizator
+        // 3. Inserare în tabelul utilizator
         const [resultUtilizator] = await sequelize.query(
-            `INSERT INTO Utilizator (email, parola, rol) VALUES (?, ?, 'membru')`,
+            `INSERT INTO utilizator (email, parola, rol) VALUES (?, ?, 'membru')`,
             { replacements: [email, parolaHash] }
         );
         const utilizatorId = resultUtilizator; // ID-ul generat automat de MySQL
 
-        // 4. Inserare în tabelul Membru (legat prin FK de Utilizator)
+        // 4. Inserare în tabelul membru (legat prin FK de utilizator)
         await sequelize.query(
-            `INSERT INTO Membru (utilizatorId, nume, prenume) VALUES (?, ?, ?)`,
+            `INSERT INTO membru (utilizatorId, nume, prenume) VALUES (?, ?, ?)`,
             { replacements: [utilizatorId, nume, prenume] }
         );
 
@@ -200,10 +200,10 @@ exports.getProfilPublic = async (req, res) => {
             `SELECT m.id, m.prenume, m.nume,
                     COUNT(DISTINCT p.id) AS postariPublicate,
                     COUNT(DISTINCT j.id) AS intrariJurnal
-             FROM Membru m
-             JOIN Utilizator u ON m.utilizatorId = u.id
-             LEFT JOIN Postare p ON p.membruId = m.id AND p.status = 'publicata'
-             LEFT JOIN JurnalProgres j ON j.membruId = m.id
+             FROM membru m
+             JOIN utilizator u ON m.utilizatorId = u.id
+             LEFT JOIN postare p ON p.membruId = m.id AND p.status = 'publicata'
+             LEFT JOIN jurnalprogres j ON j.membruId = m.id
              WHERE m.id = ?
              GROUP BY m.id`,
             { replacements: [membruId] }
@@ -212,8 +212,8 @@ exports.getProfilPublic = async (req, res) => {
 
         const [postari] = await sequelize.query(
             `SELECT p.id, p.titlu, p.dataPostare, COUNT(r.id) AS numar_raspunsuri
-             FROM Postare p
-             LEFT JOIN RaspunsPostare r ON r.postareId = p.id
+             FROM postare p
+             LEFT JOIN raspunspostare r ON r.postareId = p.id
              WHERE p.membruId = ? AND p.status = 'publicata'
              GROUP BY p.id ORDER BY p.dataPostare DESC LIMIT 10`,
             { replacements: [membruId] }
@@ -232,8 +232,8 @@ exports.getContMeu = async (req, res) => {
         const [rows] = await sequelize.query(
             `SELECT u.id AS utilizatorId, u.email, u.rol,
                     m.id AS membruId, m.nume, m.prenume
-             FROM Membru m
-             JOIN Utilizator u ON m.utilizatorId = u.id
+             FROM membru m
+             JOIN utilizator u ON m.utilizatorId = u.id
              WHERE m.id = ?`,
             { replacements: [membruId] }
         );
@@ -241,9 +241,9 @@ exports.getContMeu = async (req, res) => {
 
         const [stats] = await sequelize.query(
             `SELECT 
-                (SELECT COUNT(*) FROM JurnalProgres WHERE membruId = ?) AS intrariJurnal,
-                (SELECT COUNT(*) FROM Postare WHERE membruId = ? AND status = 'publicata') AS postariPublicate,
-                (SELECT MAX(dataIntrare) FROM JurnalProgres WHERE membruId = ?) AS ultimaIntrareJurnal`,
+                (SELECT COUNT(*) FROM jurnalprogres WHERE membruId = ?) AS intrariJurnal,
+                (SELECT COUNT(*) FROM postare WHERE membruId = ? AND status = 'publicata') AS postariPublicate,
+                (SELECT MAX(dataIntrare) FROM jurnalprogres WHERE membruId = ?) AS ultimaIntrareJurnal`,
             { replacements: [membruId, membruId, membruId] }
         );
 
@@ -259,7 +259,7 @@ exports.editareNume = async (req, res) => {
     const { membruId, numeNou, prenumeNou } = req.body;
     try {
         await sequelize.query(
-            'UPDATE Membru SET nume = ?, prenume = ? WHERE id = ?',
+            'UPDATE membru SET nume = ?, prenume = ? WHERE id = ?',
             { replacements: [numeNou, prenumeNou, membruId] }
         );
         res.json({ mesaj: 'Numele a fost actualizat cu succes!' });
@@ -273,7 +273,7 @@ exports.schimbaParola = async (req, res) => {
     const { membruId, parolaVeche, parolaNoua } = req.body;
     try {
         const [rows] = await sequelize.query(
-            'SELECT u.parola FROM Utilizator u JOIN Membru m ON u.id = m.utilizatorId WHERE m.id = ?',
+            'SELECT u.parola FROM utilizator u JOIN membru m ON u.id = m.utilizatorId WHERE m.id = ?',
             { replacements: [membruId] }
         );
         if (rows.length === 0) return res.status(404).json({ eroare: 'Utilizatorul nu există.' });
@@ -285,7 +285,7 @@ exports.schimbaParola = async (req, res) => {
         const parolaHash = await bcrypt.hash(parolaNoua, salt);
 
         await sequelize.query(
-            'UPDATE Utilizator u JOIN Membru m ON u.id = m.utilizatorId SET u.parola = ? WHERE m.id = ?',
+            'UPDATE utilizator u JOIN membru m ON u.id = m.utilizatorId SET u.parola = ? WHERE m.id = ?',
             { replacements: [parolaHash, membruId] }
         );
         res.json({ mesaj: 'Parola a fost schimbată cu succes!' });
@@ -299,17 +299,17 @@ exports.stergeCont = async (req, res) => {
     const { membruId } = req.body;
     try {
         // Ștergem datele asociate
-        await sequelize.query('DELETE FROM JurnalProgres WHERE membruId = ?', { replacements: [membruId] });
-        await sequelize.query('DELETE FROM Postare WHERE membruId = ?', { replacements: [membruId] });
-        await sequelize.query('DELETE FROM ProfilDermatologic WHERE membruId = ?', { replacements: [membruId] });
+        await sequelize.query('DELETE FROM jurnalprogres WHERE membruId = ?', { replacements: [membruId] });
+        await sequelize.query('DELETE FROM postare WHERE membruId = ?', { replacements: [membruId] });
+        await sequelize.query('DELETE FROM profildermatologic WHERE membruId = ?', { replacements: [membruId] });
 
         // Găsim utilizatorId
-        const [rows] = await sequelize.query('SELECT utilizatorId FROM Membru WHERE id = ?', { replacements: [membruId] });
+        const [rows] = await sequelize.query('SELECT utilizatorId FROM membru WHERE id = ?', { replacements: [membruId] });
         if (rows.length === 0) return res.status(404).json({ eroare: 'Utilizatorul nu există.' });
         const utilizatorId = rows[0].utilizatorId;
 
-        await sequelize.query('DELETE FROM Membru WHERE id = ?', { replacements: [membruId] });
-        await sequelize.query('DELETE FROM Utilizator WHERE id = ?', { replacements: [utilizatorId] });
+        await sequelize.query('DELETE FROM membru WHERE id = ?', { replacements: [membruId] });
+        await sequelize.query('DELETE FROM utilizator WHERE id = ?', { replacements: [utilizatorId] });
 
         res.json({ mesaj: 'Contul a fost șters.' });
     } catch (error) {
@@ -326,8 +326,8 @@ exports.login = async (req, res) => {
         // 1. Căutăm utilizatorul în BD, făcând JOIN cu Membru pentru a lua ID-ul corect
         const [users] = await sequelize.query(
             `SELECT u.id AS utilizatorId, u.email, u.parola, u.rol, m.id AS membruId, m.prenume, m.nume
-             FROM Utilizator u 
-             LEFT JOIN Membru m ON u.id = m.utilizatorId 
+             FROM utilizator u 
+             LEFT JOIN membru m ON u.id = m.utilizatorId
              WHERE u.email = ?`,
             { replacements: [email] }
         );

@@ -14,7 +14,7 @@ exports.creeazaPostare = async (req, res) => {
 
     try {
         await sequelize.query(
-            `INSERT INTO Postare (membruId, titlu, continut, status) 
+            `INSERT INTO postare (membruId, titlu, continut, status) 
              VALUES (?, ?, ?, 'in_asteptare')`,
             { replacements: [membruId, titlu, continut] }
         );
@@ -35,10 +35,10 @@ exports.getPostariPublicate = async (req, res) => {
                    COUNT(DISTINCT r.id) AS numar_raspunsuri,
                    COUNT(DISTINCT l.id) AS numar_likeuri,
                    MAX(CASE WHEN l.membruId = ? THEN 1 ELSE 0 END) AS likedDeMine
-            FROM Postare p
-            JOIN Membru m ON p.membruId = m.id
-            LEFT JOIN RaspunsPostare r ON p.id = r.postareId
-            LEFT JOIN LikePostare l ON p.id = l.postareId
+            FROM postare p
+            JOIN membru m ON p.membruId = m.id
+            LEFT JOIN raspunspostare r ON p.id = r.postareId
+            LEFT JOIN likepostare l ON p.id = l.postareId
             WHERE p.status = 'publicata'
             GROUP BY p.id
             ORDER BY p.dataPostare DESC
@@ -57,7 +57,7 @@ exports.adaugaReply = async (req, res) => {
 
     try {
         await sequelize.query(
-            `INSERT INTO RaspunsPostare (postareId, membruId, continut) 
+            `INSERT INTO raspunspostare (postareId, membruId, continut) 
              VALUES (?, ?, ?)`,
             { replacements: [postareId, membruId, continut] }
         );
@@ -75,7 +75,7 @@ exports.getPostareCuReplies = async (req, res) => {
         // Detalii postare
         const [postareData] = await sequelize.query(
             `SELECT p.*, m.nume AS autor 
-             FROM Postare p JOIN Membru m ON p.membruId = m.id 
+             FROM postare p JOIN membru m ON p.membruId = m.id 
              WHERE p.id = ? AND p.status = 'publicata'`,
             { replacements: [id] }
         );
@@ -85,7 +85,7 @@ exports.getPostareCuReplies = async (req, res) => {
         // Răspunsurile postării
         const [replies] = await sequelize.query(
             `SELECT r.*, m.nume AS autor 
-             FROM RaspunsPostare r JOIN Membru m ON r.membruId = m.id 
+             FROM raspunspostare r JOIN membru m ON r.membruId = m.id 
              WHERE r.postareId = ? ORDER BY r.dataRaspuns ASC`,
             { replacements: [id] }
         );
@@ -103,8 +103,8 @@ exports.getPostariInAsteptare = async (req, res) => {
     try {
         const [postari] = await sequelize.query(`
             SELECT p.id, p.titlu, p.continut, p.dataPostare, m.nume AS autor
-            FROM Postare p
-            JOIN Membru m ON p.membruId = m.id
+            FROM postare p
+            JOIN membru m ON p.membruId = m.id
             WHERE p.status = 'in_asteptare'
             ORDER BY p.dataPostare ASC
         `);
@@ -118,7 +118,7 @@ exports.getPostariInAsteptare = async (req, res) => {
 exports.numarInAsteptare = async (req, res) => {
     try {
         const [result] = await sequelize.query(
-            `SELECT COUNT(*) AS numar FROM Postare WHERE status = 'in_asteptare'`
+            `SELECT COUNT(*) AS numar FROM postare WHERE status = 'in_asteptare'`
         );
         res.json({ numar: result[0].numar });
     } catch (error) {
@@ -132,15 +132,15 @@ exports.toggleLike = async (req, res) => {
     const { membruId } = req.body;
     try {
         const [existing] = await sequelize.query(
-            'SELECT id FROM LikePostare WHERE postareId = ? AND membruId = ?',
+            'SELECT id FROM likepostare WHERE postareId = ? AND membruId = ?',
             { replacements: [postareId, membruId] }
         );
         if (existing.length > 0) {
-            await sequelize.query('DELETE FROM LikePostare WHERE postareId = ? AND membruId = ?', { replacements: [postareId, membruId] });
+            await sequelize.query('DELETE FROM likepostare WHERE postareId = ? AND membruId = ?', { replacements: [postareId, membruId] });
         } else {
-            await sequelize.query('INSERT INTO LikePostare (postareId, membruId) VALUES (?, ?)', { replacements: [postareId, membruId] });
+            await sequelize.query('INSERT INTO likepostare (postareId, membruId) VALUES (?, ?)', { replacements: [postareId, membruId] });
         }
-        const [count] = await sequelize.query('SELECT COUNT(*) AS total FROM LikePostare WHERE postareId = ?', { replacements: [postareId] });
+        const [count] = await sequelize.query('SELECT COUNT(*) AS total FROM likepostare WHERE postareId = ?', { replacements: [postareId] });
         res.json({ likeuri: count[0].total, likedDeMine: existing.length === 0 });
     } catch (error) {
         res.status(500).json({ eroare: 'Eroare la like.' });
@@ -158,7 +158,7 @@ exports.modereazaPostare = async (req, res) => {
 
     try {
         await sequelize.query(
-            `UPDATE Postare SET status = ? WHERE id = ?`,
+            `UPDATE postare SET status = ? WHERE id = ?`,
             { replacements: [actiune, id] }
         );
 
@@ -166,9 +166,9 @@ exports.modereazaPostare = async (req, res) => {
         if (actiune === 'publicata') {
             const [rows] = await sequelize.query(
                 `SELECT p.titlu, m.prenume, u.email 
-                 FROM Postare p 
-                 JOIN Membru m ON p.membruId = m.id 
-                 JOIN Utilizator u ON m.utilizatorId = u.id 
+                 FROM postare p 
+                 JOIN membru m ON p.membruId = m.id 
+                 JOIN utilizator u ON m.utilizatorId = u.id 
                  WHERE p.id = ?`,
                 { replacements: [id] }
             );
