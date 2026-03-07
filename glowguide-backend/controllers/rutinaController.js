@@ -29,7 +29,10 @@ exports.genereazaRutina = async (req, res) => {
         }
 
         // 2. Arhivăm o rutină veche, dacă membrul avea deja una activă
-        await sequelize.query('CALL arhiveazaRutinaVeche(?)', { replacements: [membruId] });
+        await sequelize.query(
+            `UPDATE rutina SET status = 'arhivata' WHERE membruId = ? AND status = 'activa'`,
+            { replacements: [membruId] }
+        );
 
         // Categoriile standard pe care trebuie să le conțină rutina
         const categorii = ['curatare', 'toner', 'ser', 'hidratant', 'spf'];

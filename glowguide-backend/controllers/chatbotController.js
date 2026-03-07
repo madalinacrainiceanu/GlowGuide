@@ -33,7 +33,7 @@ exports.intreaba = async (req, res) => {
             const [rezultateCK] = await sequelize.query(
                 `SELECT id, raspuns, categorie, numarAfisari,
                     (${cuvinte.map(() => '(CASE WHEN LOWER(cuvinteCheie) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor
-                 FROM FAQ
+                 FROM faq
                  WHERE ${conditii}
                  ORDER BY scor DESC, numarAfisari DESC
                  LIMIT 1`,
@@ -44,7 +44,7 @@ exports.intreaba = async (req, res) => {
 
             if (rezultateCK.length > 0 && rezultateCK[0].scor >= scorMinim) {
                 await sequelize.query(
-                    'UPDATE FAQ SET numarAfisari = numarAfisari + 1 WHERE id = ?',
+                    'UPDATE faq SET numarAfisari = numarAfisari + 1 WHERE id = ?',
                     { replacements: [rezultateCK[0].id] }
                 );
                 return res.json({
@@ -63,7 +63,7 @@ exports.intreaba = async (req, res) => {
             const [rezultateInt] = await sequelize.query(
                 `SELECT id, raspuns, categorie,
                     (${cuvinte.map(() => '(CASE WHEN LOWER(intrebare) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor
-                 FROM FAQ
+                 FROM faq
                  WHERE ${conditiiIntrebare}
                  ORDER BY scor DESC, numarAfisari DESC
                  LIMIT 1`,
@@ -74,7 +74,7 @@ exports.intreaba = async (req, res) => {
 
             if (rezultateInt.length > 0 && rezultateInt[0].scor >= scorMinim2) {
                 await sequelize.query(
-                    'UPDATE FAQ SET numarAfisari = numarAfisari + 1 WHERE id = ?',
+                    'UPDATE faq SET numarAfisari = numarAfisari + 1 WHERE id = ?',
                     { replacements: [rezultateInt[0].id] }
                 );
                 return res.json({
