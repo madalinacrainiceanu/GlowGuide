@@ -7,7 +7,7 @@ exports.adaugaIntrare = async (req, res) => {
 
     try {
         await sequelize.query(
-            'INSERT INTO JurnalProgres (membruId, rating, observatii, dataIntrare) VALUES (?, ?, ?, ?)',
+            'INSERT INTO jurnalprogres (membruId, rating, observatii, dataIntrare) VALUES (?, ?, ?, ?)',
             { replacements: [membruId, rating, observatii, azi] }
         );
         res.json({ mesaj: 'Salvata cu succes!' });
@@ -22,7 +22,7 @@ exports.getEvolutie = async (req, res) => {
     try {
         // Aducem direct toate notele. Fara funcții de data SQL care să strice formatul.
         const [toateNotele] = await sequelize.query(
-            `SELECT dataIntrare, rating FROM JurnalProgres WHERE membruId = ?`,
+            `SELECT dataIntrare, rating FROM jurnalprogres WHERE membruId = ?`,
             { replacements: [id] }
         );
 
@@ -96,7 +96,7 @@ exports.getIstoricJurnal = async (req, res) => {
     const { id } = req.params;
     try {
         const [istoric] = await sequelize.query(
-            `SELECT * FROM JurnalProgres WHERE membruId = ? ORDER BY id DESC`,
+            `SELECT * FROM jurnalprogres WHERE membruId = ? ORDER BY id DESC`,
             { replacements: [id] }
         );
         res.json(istoric);
@@ -111,7 +111,7 @@ exports.stergeIntrare = async (req, res) => {
     const { notaId } = req.params;
     try {
         await sequelize.query(
-            'DELETE FROM JurnalProgres WHERE id = ?',
+            'DELETE FROM jurnalprogres WHERE id = ?',
             { replacements: [notaId] }
         );
         res.json({ mesaj: 'Notă ștearsă cu succes!' });
@@ -125,7 +125,7 @@ exports.editeazaIntrare = async (req, res) => {
     const { rating, observatii } = req.body;
     try {
         await sequelize.query(
-            'UPDATE JurnalProgres SET rating = ?, observatii = ? WHERE id = ?',
+            'UPDATE jurnalprogres SET rating = ?, observatii = ? WHERE id = ?',
             { replacements: [rating, observatii, notaId] }
         );
         res.json({ mesaj: 'Notă actualizată!' });
@@ -138,7 +138,7 @@ exports.exportCSV = async (req, res) => {
     const { id } = req.params;
     try {
         const [intrari] = await sequelize.query(
-            `SELECT dataIntrare, rating, observatii FROM JurnalProgres WHERE membruId = ? ORDER BY dataIntrare ASC`,
+            `SELECT dataIntrare, rating, observatii FROM jurnalprogres WHERE membruId = ? ORDER BY dataIntrare ASC`,
             { replacements: [id] }
         );
         const header = 'Data,Rating,Observatii\n';

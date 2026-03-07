@@ -7,7 +7,7 @@ exports.genereazaRutina = async (req, res) => {
     try {
         // 1. Obținem profilul dermatologic al membrului din baza de date
         const [profilResult] = await sequelize.query(
-            'SELECT * FROM ProfilDermatologic WHERE membruId = ?',
+            'SELECT * FROM profildermatologic WHERE membruId = ?',
             { replacements: [membruId] }
         );
 
@@ -48,8 +48,8 @@ exports.genereazaRutina = async (req, res) => {
                 const placeholders = alergeniArray.map(() => '?').join(',');
                 excludereAlergeniSql = `
                     AND NOT EXISTS (
-                        SELECT 1 FROM ProdusIngredient pi
-                        JOIN Ingredient i ON pi.ingredientId = i.id
+                        SELECT 1 FROM produsingredient pi
+                        JOIN ingredient i ON pi.ingredientId = i.id
                         WHERE pi.produsId = p.id AND i.nume IN (${placeholders})
                     )
                 `;
@@ -59,7 +59,7 @@ exports.genereazaRutina = async (req, res) => {
             // Query-ul principal de căutare
             const queryText = `
                 SELECT DISTINCT p.id, p.nume, p.brand, p.categorie, p.rating
-                FROM Produs p
+                FROM produs p
                 WHERE p.categorie = ?
                   AND p.tipTenRecomandat LIKE ?
                   ${excludereAlergeniSql}
@@ -77,7 +77,7 @@ exports.genereazaRutina = async (req, res) => {
 
         // 4. Creăm instanța noii rutine în baza de date
         const [insertRutina] = await sequelize.query(
-            `INSERT INTO Rutina (membruId, tip, status) VALUES (?, 'completa', 'activa')`,
+            `INSERT INTO rutina (membruId, tip, status) VALUES (?, 'completa', 'activa')`,
             { replacements: [membruId] }
         );
         const rutinaId = insertRutina; // preluăm ID-ul auto_increment generat
@@ -86,7 +86,7 @@ exports.genereazaRutina = async (req, res) => {
         for (let i = 0; i < produseRecomandate.length; i++) {
             const produs = produseRecomandate[i];
             await sequelize.query(
-                `INSERT INTO RutinaProdus (rutinaId, produsId, ordineAplicare) VALUES (?, ?, ?)`,
+                `INSERT INTO rutinaprodus (rutinaId, produsId, ordineAplicare) VALUES (?, ?, ?)`,
                 { replacements: [rutinaId, produs.id, i + 1] }
             );
         }
@@ -128,7 +128,7 @@ exports.salveazaProfil = async (req, res) => {
     try {
         // Folosim ON DUPLICATE KEY UPDATE. Astfel, dacă utilizatorul reface chestionarul, i se updatează profilul vechi
         await sequelize.query(
-            `INSERT INTO ProfilDermatologic (membruId, tipTen, alergii, probleme) 
+            `INSERT INTO profildermatologic (membruId, tipTen, alergii, probleme) 
              VALUES (?, ?, ?, ?) 
              ON DUPLICATE KEY UPDATE tipTen = VALUES(tipTen), alergii = VALUES(alergii), probleme = VALUES(probleme)`,
             { replacements: [membruId, tipTen, alergii, probleme || '[]'] }
