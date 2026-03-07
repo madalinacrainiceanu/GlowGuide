@@ -2,6 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 const INTREBARI = [
   {
@@ -150,7 +151,7 @@ export default function Profil() {
     setRezultatFinal(diagnostic.diagnosticAfisat);
     const arrayAlergii = alergii.split(',').map(i => i.trim()).filter(i => i);
     try {
-      await axios.post('http://localhost:5000/api/rutina/salveaza-profil', {
+      await axios.post(`${API_URL}/api/rutina/salveaza-profil`, {
         membruId: user.id,
         tipTen: diagnostic.tipDeBazaBackend,
         probleme: JSON.stringify(diagnostic.problemeBackend),

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
+import API_URL from '../api';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (user?.rol === 'admin') {
-      axios.get('http://localhost:5000/api/forum/admin/numar-asteptare')
+      axios.get(`${API_URL}/api/forum/admin/numar-asteptare`)
         .then(r => setBadgeAdmin(r.data.numar))
         .catch(() => {});
     }

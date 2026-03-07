@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 export default function AdminModerare() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function AdminModerare() {
 
   const incarcaPostari = async () => {
     try {
-      const res = await axios.get('http://localhost:5000/api/forum/admin/in-asteptare');
+      const res = await axios.get(`${API_URL}/api/forum/admin/in-asteptare`);
       setPostariInAsteptare(res.data);
     } catch (e) {
       console.log('Eroare încărcare postări:', e);
@@ -34,7 +35,7 @@ export default function AdminModerare() {
 
   const modereaza = async (id, actiune) => {
     try {
-      await axios.put(`http://localhost:5000/api/forum/admin/moderare/${id}`, { actiune });
+      await axios.put(`${API_URL}/api/forum/admin/moderare/${id}`, { actiune });
       setMesaje(prev => ({ ...prev, [id]: actiune === 'publicata' ? '✅ Aprobată!' : '❌ Respinsă!' }));
       // Scoate postarea din listă după 1.5s
       setTimeout(() => {

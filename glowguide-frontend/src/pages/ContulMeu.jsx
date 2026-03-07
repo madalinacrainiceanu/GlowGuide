@@ -2,10 +2,9 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 const CULORI_AVATAR = ['#b06090', '#6aab9e', '#e8956d', '#7b68ee', '#e91e8c', '#00897b'];
-
-function getculoareAvatar(nume) {
   let hash = 0;
   for (let i = 0; i < (nume || '').length; i++) hash = nume.charCodeAt(i) + ((hash << 5) - hash);
   return CULORI_AVATAR[Math.abs(hash) % CULORI_AVATAR.length];
@@ -42,7 +41,7 @@ export default function ContulMeu() {
 
   useEffect(() => {
     if (!user) { navigate('/login'); return; }
-    axios.get(`http://localhost:5000/api/auth/cont/${user.id}`)
+    axios.get(`${API_URL}/api/auth/cont/${user.id}`)
       .then(r => {
         setCont(r.data);
         setNumeNou(r.data.nume || '');
@@ -59,7 +58,7 @@ export default function ContulMeu() {
 
   const salveazaNume = async () => {
     try {
-      await axios.put('http://localhost:5000/api/auth/editare-nume', {
+      await axios.put(`${API_URL}/api/auth/editare-nume`, {
         membruId: user.id, numeNou, prenumeNou
       });
       setCont(prev => ({ ...prev, nume: numeNou, prenume: prenumeNou }));
@@ -75,7 +74,7 @@ export default function ContulMeu() {
     if (parolaNoua !== parolaConfirm) { setMesajParola('❌ Parolele noi nu se potrivesc.'); return; }
     if (parolaNoua.length < 6) { setMesajParola('❌ Parola trebuie să aibă minim 6 caractere.'); return; }
     try {
-      await axios.put('http://localhost:5000/api/auth/schimba-parola', {
+      await axios.put(`${API_URL}/api/auth/schimba-parola`, {
         membruId: user.id, parolaVeche, parolaNoua
       });
       setMesajParola('✅ Parola a fost schimbată!');
@@ -89,7 +88,7 @@ export default function ContulMeu() {
 
   const stergeContul = async () => {
     try {
-      await axios.delete('http://localhost:5000/api/auth/sterge-cont', { data: { membruId: user.id } });
+      await axios.delete(`${API_URL}/api/auth/sterge-cont`, { data: { membruId: user.id } });
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       navigate('/');

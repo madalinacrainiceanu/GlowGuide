@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 const CULORI = ['#b06090', '#6aab9e', '#e8956d', '#7b68ee', '#e91e8c', '#00897b'];
 const getCuloare = (nume) => {
@@ -18,7 +19,7 @@ export default function ProfilPublic() {
   const [eroare, setEroare] = useState('');
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/auth/profil-public/${membruId}`)
+    axios.get(`${API_URL}/api/auth/profil-public/${membruId}`)
       .then(r => setProfil(r.data))
       .catch(() => setEroare('Profilul nu a putut fi încărcat.'))
       .finally(() => setLoading(false));

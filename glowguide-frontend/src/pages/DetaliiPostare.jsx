@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 export default function DetaliiPostare() {
   const { id } = useParams();
@@ -17,7 +18,7 @@ export default function DetaliiPostare() {
 
   const incarcaPostare = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/forum/${id}`);
+      const res = await axios.get(`${API_URL}/api/forum/${id}`);
       setPostare(res.data.postare);
       setReplies(res.data.replies);
     } catch (e) {
@@ -35,7 +36,7 @@ export default function DetaliiPostare() {
     e.preventDefault();
     setMesaj('');
     try {
-      await axios.post(`http://localhost:5000/api/forum/${id}/reply`, {
+      await axios.post(`${API_URL}/api/forum/${id}/reply`, {
         membruId: user.membruId || user.id,
         continut: continutReply,
       });

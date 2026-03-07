@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import API_URL from '../api';
 
 export default function Register() {
   const [pas, setPas] = useState(1); // 1 = formular, 2 = cod email
@@ -23,7 +24,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/auth/trimite-cod', { email, parola, nume, prenume });
+      await axios.post(`${API_URL}/api/auth/trimite-cod`, { email, parola, nume, prenume });
       setSucces(`Cod trimis pe ${email}! Verifică inbox-ul (și Spam).`);
       setPas(2);
     } catch (err) {
@@ -38,7 +39,7 @@ export default function Register() {
     setEroare('');
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/auth/verifica-cod', { email, cod });
+      await axios.post(`${API_URL}/api/auth/verifica-cod`, { email, cod });
       setSucces('Cont creat cu succes! Te redirecționăm...');
       setTimeout(() => navigate('/'), 2000);
     } catch (err) {

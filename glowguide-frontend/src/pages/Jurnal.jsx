@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import Navbar from '../components/Navbar';
+import API_URL from '../api';
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler);
 
@@ -30,7 +31,7 @@ export default function Jurnal() {
     
     // 1. Încărcare Grafic (Forțăm afișarea oricărui set de date)
     try {
-        const raspunsGrafic = await axios.get(`http://localhost:5000/api/jurnal/evolutie/${user.id}`);
+        const raspunsGrafic = await axios.get(`${API_URL}/api/jurnal/evolutie/${user.id}`);
         const dateBackend = raspunsGrafic.data;
 
         // Dacă backend-ul trimite cel puțin o înregistrare, facem graficul
@@ -58,7 +59,7 @@ export default function Jurnal() {
 
     // 2. Încărcare Istoric (Agenda)
     try {
-        const raspunsIstoric = await axios.get(`http://localhost:5000/api/jurnal/istoric/${user.id}`);
+        const raspunsIstoric = await axios.get(`${API_URL}/api/jurnal/istoric/${user.id}`);
         setIstoric(raspunsIstoric.data);
     } catch (e) { 
         console.log("Eroare istoric:", e); 
@@ -76,7 +77,7 @@ export default function Jurnal() {
     setMesaj('');
 
     try {
-      await axios.post('http://localhost:5000/api/jurnal/adauga', { 
+      await axios.post(`${API_URL}/api/jurnal/adauga`, { 
           membruId: user.id, 
           rating: rating, 
           observatii: observatii 
@@ -98,7 +99,7 @@ export default function Jurnal() {
       if (!confirmare) return;
 
       try {
-          await axios.delete(`http://localhost:5000/api/jurnal/sterge/${idStergere}`);
+          await axios.delete(`${API_URL}/api/jurnal/sterge/${idStergere}`);
           incarcaDateJurnal(); // Se va actualiza și graficul automat!
       } catch (e) { 
           console.log("Eroare la ștergere:", e); 
@@ -113,7 +114,7 @@ export default function Jurnal() {
 
   const salveazaEditare = async (idEditat) => {
       try {
-          await axios.put(`http://localhost:5000/api/jurnal/editeaza/${idEditat}`, {
+          await axios.put(`${API_URL}/api/jurnal/editeaza/${idEditat}`, {
               rating: ratingEdit,
               observatii: observatiiEdit
           });
@@ -142,7 +143,7 @@ export default function Jurnal() {
             <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>Urmărește evoluția tenului și notează observațiile zilnice</p>
           </div>
           <a
-            href={`http://localhost:5000/api/jurnal/export-csv/${user?.id}`}
+            href={`${API_URL}/api/jurnal/export-csv/${user?.id}`}
             download="jurnal_glowguide.csv"
             style={{
               padding: '9px 18px', backgroundColor: 'white', color: '#6aab9e',
