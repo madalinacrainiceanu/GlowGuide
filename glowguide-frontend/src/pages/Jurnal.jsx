@@ -28,6 +28,7 @@ export default function Jurnal() {
   const [ratingEdit, setRatingEdit] = useState(5);
   const [observatiiEdit, setObservatiiEdit] = useState('');
   const [pozaEdit, setPozaEdit] = useState(null);
+  const [pozaEditPreview, setPozaEditPreview] = useState(null);
 
   const incarcaDateJurnal = async () => {
     if (!user) return;
@@ -119,6 +120,8 @@ export default function Jurnal() {
       setEditareId(nota.id);
       setRatingEdit(nota.rating);
       setObservatiiEdit(nota.observatii);
+      setPozaEdit(null);
+      setPozaEditPreview(nota.poza || null);
   };
 
   const salveazaEditare = async (idEditat) => {
@@ -269,7 +272,13 @@ export default function Jurnal() {
                                   <textarea value={observatiiEdit} onChange={(e) => setObservatiiEdit(e.target.value)} rows="3" style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc'}} />
                                   <div>
                                       <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', display: 'block', marginBottom: '6px' }}>Schimba poza (optional)</label>
-                                      <input type="file" accept="image/*" onChange={(e) => { if(e.target.files[0]) setPozaEdit(e.target.files[0]); }} style={{ fontSize: '13px' }} />
+                                      {pozaEditPreview && !pozaEdit && (
+                                          <div style={{ marginBottom: '8px' }}>
+                                              <p style={{ fontSize: '12px', color: '#888', margin: '0 0 6px' }}>Poza actuala:</p>
+                                              <img src={pozaEditPreview} alt="poza curenta" style={{ width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '10px', border: '1.5px solid #e5e7eb' }} />
+                                          </div>
+                                      )}
+                                      <input type="file" accept="image/*" onChange={(e) => { if(e.target.files[0]) { setPozaEdit(e.target.files[0]); setPozaEditPreview(null); } }} style={{ fontSize: '13px' }} />
                                       {pozaEdit && <p style={{ fontSize: '12px', color: '#6aab9e', marginTop: '4px', marginBottom: 0 }}>Poza noua selectata</p>}
                                   </div>
                                   
