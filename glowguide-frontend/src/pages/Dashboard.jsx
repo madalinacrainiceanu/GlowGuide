@@ -7,15 +7,15 @@ const CARDURI = [
     emoji: '👤',
     titlu: 'Profilul Meu',
     descriere: 'Completează chestionarul și descoperă tipul tău de ten',
-    gradient: 'linear-gradient(135deg, #fdf0f8, #f5e0ee)',
+    bg: '#fce8f3',
     culoare: '#8f4d74',
   },
   {
     path: '/rutina',
-    emoji: '💆',
+    emoji: '🧴',
     titlu: 'Rutina Mea',
     descriere: 'Produse recomandate special pentru tipul tău de ten',
-    gradient: 'linear-gradient(135deg, #eef6f4, #d8ede8)',
+    bg: '#e8f4f0',
     culoare: '#4a897e',
   },
   {
@@ -23,15 +23,15 @@ const CARDURI = [
     emoji: '📔',
     titlu: 'Jurnal de Progres',
     descriere: 'Urmărește evoluția tenului tău cu grafice și notițe',
-    gradient: 'linear-gradient(135deg, #fef6ef, #fce7d8)',
+    bg: '#fef0e6',
     culoare: '#b5622a',
   },
   {
     path: '/forum',
     emoji: '💬',
     titlu: 'Comunitate',
-    descriere: 'Sfaturi, experiențe și discuții cu alte utilizatoare',
-    gradient: 'linear-gradient(135deg, #eff5fd, #d8e8f8)',
+    descriere: 'Sfaturi, experiențe și discuții cu alți utilizatori',
+    bg: '#e8f0fc',
     culoare: '#3a7aaa',
   },
   {
@@ -39,7 +39,7 @@ const CARDURI = [
     emoji: '🤖',
     titlu: 'GlowBot AI',
     descriere: 'Asistentul tău personal de skincare — întreabă orice!',
-    gradient: 'linear-gradient(135deg, #f4f0fc, #e6dff8)',
+    bg: '#f0ecfc',
     culoare: '#5b4a9a',
   },
 ];
@@ -60,19 +60,18 @@ export default function Dashboard() {
       <Navbar />
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '32px 20px' }}>
         <div style={{
-          background: 'linear-gradient(135deg, #b06090 0%, #6aab9e 100%)',
-          borderRadius: '20px', padding: '32px 36px', marginBottom: '36px',
-          color: 'white', position: 'relative', overflow: 'hidden'
+          backgroundColor: '#b06090',
+          borderRadius: '16px', padding: '32px 36px', marginBottom: '36px',
+          color: 'white',
         }}>
-          <div style={{ position: 'absolute', right: '30px', top: '50%', transform: 'translateY(-50%)', fontSize: '80px', opacity: 0.15 }}>🌸</div>
           <p style={{ margin: '0 0 4px', fontSize: '14px', opacity: 0.85 }}>{salut},</p>
-          <h1 style={{ margin: '0 0 8px', fontSize: '28px', fontWeight: '800' }}>{prenume} ✨</h1>
-          <p style={{ margin: 0, opacity: 0.85, fontSize: '14px' }}>Cum se simte tenul tău azi? Continuă rutina și urmărește progresul!</p>
+          <h1 style={{ margin: '0 0 8px', fontSize: '28px', fontWeight: '800' }}>{prenume}</h1>
+          <p style={{ margin: 0, opacity: 0.85, fontSize: '14px' }}>Continuă rutina și urmărește progresul tenului tău.</p>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
           {CARDURI.map(card => (
             <div key={card.path} onClick={() => navigate(card.path)}
-              style={{ background: card.gradient, borderRadius: '16px', padding: '28px', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}
+              style={{ background: card.bg, borderRadius: '16px', padding: '28px', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.06)'; }}
             >
@@ -84,7 +83,7 @@ export default function Dashboard() {
           ))}
           {user.rol === 'admin' && (
             <div onClick={() => navigate('/admin/moderare')}
-              style={{ background: 'linear-gradient(135deg, #ffebee, #ffcdd2)', borderRadius: '16px', padding: '28px', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 4px 15px rgba(0,0,0,0.06)', border: '2px dashed #ef9a9a' }}
+              style={{ backgroundColor: '#fdecea', borderRadius: '16px', padding: '28px', cursor: 'pointer', transition: 'transform 0.2s, box-shadow 0.2s', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', border: '2px dashed #f5a5a5' }}
               onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(0,0,0,0.12)'; }}
               onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.06)'; }}
             >

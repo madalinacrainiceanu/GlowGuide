@@ -173,16 +173,16 @@ export default function Profil() {
       <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
         <Navbar />
         <div style={{ maxWidth: '560px', margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
-          <div style={{ fontSize: '72px', marginBottom: '20px' }}>✨</div>
+          <div style={{ fontSize: '48px', marginBottom: '20px' }}>🧬</div>
           <h2 style={{ color: '#2d3142', fontSize: '24px', marginBottom: '12px' }}>Analiză Finalizată!</h2>
           <div style={{
-            background: 'linear-gradient(135deg, #fdf0f8, #f5e0ee)',
-            borderRadius: '20px', padding: '28px', marginBottom: '24px',
+            backgroundColor: '#fce8f3',
+            borderRadius: '16px', padding: '28px', marginBottom: '24px',
           }}>
             <p style={{ color: '#7a7a8c', fontSize: '14px', margin: '0 0 12px' }}>Profilul tău dermatologic:</p>
             <p style={{ fontSize: '22px', fontWeight: '800', color: '#8f4d74', margin: 0 }}>{rezultatFinal}</p>
           </div>
-          <p style={{ color: '#7a7a8c', fontSize: '14px' }}>🌿 Generăm rutina personalizată... te rugăm să aștepți.</p>
+          <p style={{ color: '#7a7a8c', fontSize: '14px' }}>Generăm rutina personalizată... te rugăm să aștepți.</p>
         </div>
       </div>
     );
@@ -195,7 +195,7 @@ export default function Profil() {
 
         {/* HEADER */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <h2 style={{ color: '#2d3142', fontSize: '22px', fontWeight: '800', margin: '0 0 6px' }}>🧬 Analiza Profilului Tău</h2>
+          <h2 style={{ color: '#2d3142', fontSize: '22px', fontWeight: '800', margin: '0 0 6px' }}>Analiza Profilului Tău</h2>
           <p style={{ color: '#7a7a8c', fontSize: '14px', margin: 0 }}>
             {pas < INTREBARI.length ? `Întrebarea ${pas + 1} din ${INTREBARI.length}` : 'Ultimul pas — alergii'}
           </p>
@@ -211,7 +211,7 @@ export default function Profil() {
             <div style={{
               height: '100%',
               width: `${progres}%`,
-              background: 'linear-gradient(90deg, #b06090, #6aab9e)',
+              backgroundColor: '#b06090',
               borderRadius: '10px',
               transition: 'width 0.4s ease',
             }} />
@@ -294,7 +294,7 @@ export default function Profil() {
             boxShadow: '0 8px 30px rgba(45,49,66,0.08)', padding: '36px',
           }}>
             <p style={{ fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '1px', color: '#6aab9e', marginBottom: '12px' }}>
-              🌿 Opțional
+              Opțional
             </p>
             <h3 style={{ color: '#2d3142', fontSize: '18px', fontWeight: '700', marginBottom: '10px', lineHeight: '1.4' }}>
               Ai alergii sau ingrediente pe care le eviți?
@@ -320,13 +320,12 @@ export default function Profil() {
               disabled={loading}
               style={{
                 width: '100%', padding: '16px',
-                background: loading ? '#d4b0c4' : 'linear-gradient(135deg, #b06090, #6aab9e)',
+                background: loading ? '#d4b0c4' : '#b06090',
                 color: 'white', border: 'none', borderRadius: '14px',
                 fontWeight: '700', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 20px rgba(176,96,144,0.3)',
               }}
             >
-              {loading ? '⏳ Analizăm...' : '✨ Generează Diagnostic și Rutină'}
+              {loading ? 'Se analizează...' : 'Generează Diagnostic și Rutină'}
             </button>
             <button
               onClick={() => setPas(p => p - 1)}

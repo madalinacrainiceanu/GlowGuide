@@ -37,11 +37,11 @@ export default function Forum() {
       await axios.post(`${API_URL}/api/forum/adauga`, {
         membruId: user.membruId || user.id, titlu, continut,
       });
-      setMesaj('✅ Postarea ta a fost trimisă și urmează să fie aprobată!');
+              setMesaj('Postarea ta a fost trimisă și urmează să fie aprobată!');
       setTitlu(''); setContinut('');
       setTimeout(() => setMesaj(''), 5000);
     } catch (e) {
-      setMesaj('❌ Eroare la trimiterea postării.');
+      setMesaj('Eroare la trimiterea postării.');
     }
   };
 
@@ -98,7 +98,7 @@ export default function Forum() {
 
         {/* HEADER */}
         <div style={{ marginBottom: '28px' }}>
-          <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>💬 Comunitatea GlowGuide</h1>
+          <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>Comunitatea GlowGuide</h1>
           <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>Împărtășește experiențe și sfaturi cu comunitatea</p>
         </div>
 
@@ -107,11 +107,11 @@ export default function Forum() {
           <input
             value={cautare}
             onChange={e => setCautare(e.target.value)}
-            placeholder="🔍 Caută în discuții..."
+            placeholder="Caută în discuții..."
             style={{ flex: 1, minWidth: '200px', padding: '10px 16px', borderRadius: '12px', border: '1.5px solid #e5e7eb', fontSize: '14px', outline: 'none', fontFamily: 'inherit', backgroundColor: 'white' }}
           />
           <div style={{ display: 'flex', gap: '6px' }}>
-            {[{ val: 'recent', label: '🕐 Recente' }, { val: 'popular', label: '🔥 Populare' }].map(s => (
+            {[{ val: 'recent', label: 'Recente' }, { val: 'popular', label: 'Populare' }].map(s => (
               <button key={s.val} onClick={() => setSortare(s.val)} style={{
                 padding: '10px 16px', borderRadius: '12px', border: 'none', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '600',
@@ -129,7 +129,7 @@ export default function Forum() {
 
           {/* FORMULAR POSTARE */}
           <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', alignSelf: 'start' }}>
-            <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#222', fontSize: '16px' }}>✍️ Postare nouă</h3>
+            <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#222', fontSize: '16px' }}>Postare nouă</h3>
             <form onSubmit={trimitePostare} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
                 <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Titlu</label>
@@ -148,19 +148,18 @@ export default function Forum() {
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
               </div>
               <button type="submit" style={{
-                padding: '12px', background: 'linear-gradient(135deg, #b06090, #6aab9e)',
+                padding: '12px', backgroundColor: '#b06090',
                 color: 'white', border: 'none', borderRadius: '10px',
                 fontWeight: '700', fontSize: '14px', cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(176,96,144,0.25)'
               }}>
-                📤 Trimite spre aprobare
+                Trimite spre aprobare
               </button>
             </form>
             {mesaj && (
               <div style={{
                 marginTop: '14px', padding: '12px', borderRadius: '10px', textAlign: 'center',
-                backgroundColor: mesaj.startsWith('✅') ? '#f0fdf4' : '#fff5f5',
-                color: mesaj.startsWith('✅') ? '#16a34a' : '#dc2626', fontSize: '13px', fontWeight: '600'
+                backgroundColor: mesaj.startsWith('Postarea') ? '#f0fdf4' : '#fff5f5',
+                color: mesaj.startsWith('Postarea') ? '#16a34a' : '#dc2626', fontSize: '13px', fontWeight: '600'
               }}>
                 {mesaj}
               </div>
@@ -170,14 +169,14 @@ export default function Forum() {
           {/* FEED POSTĂRI */}
           <div>
             <h3 style={{ marginTop: 0, marginBottom: '16px', color: '#222', fontSize: '16px' }}>
-              🌸 Discuții {cautare ? `— ${postariAfisate.length} rezultate` : `recente (${postariAfisate.length})`}
+              Discuții {cautare ? `— ${postariAfisate.length} rezultate` : `recente (${postariAfisate.length})`}
             </h3>
             {loadingPostari ? (
               <p style={{ color: '#aaa', textAlign: 'center' }}>Se încarcă...</p>
             ) : postariAfisate.length === 0 ? (
               <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '20px', textAlign: 'center', color: '#aaa', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
                 <div style={{ fontSize: '48px', marginBottom: '12px' }}>{cautare ? '🔍' : '🌱'}</div>
-                <p style={{ margin: 0 }}>{cautare ? 'Nicio postare nu corespunde căutării.' : 'Comunitatea e nouă! Fii prima care postează.'}</p>
+                <p style={{ margin: 0 }}>{cautare ? 'Nicio postare nu corespunde căutării.' : 'Comunitatea e nouă! Fii primul/prima care postează.'}</p>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -216,7 +215,7 @@ export default function Forum() {
                       </div>
                       {esteNou(postare.dataPostare) && (
                         <span style={{ backgroundColor: '#eef6f4', color: '#4a897e', padding: '2px 10px', borderRadius: '20px', fontSize: '11px', fontWeight: '700' }}>
-                          ✨ Nou
+                          Nou
                         </span>
                       )}
                     </div>
