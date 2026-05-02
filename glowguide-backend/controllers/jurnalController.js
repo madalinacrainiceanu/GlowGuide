@@ -1,14 +1,16 @@
 const sequelize = require('../db');
+const { cloudinary } = require('../uploadMiddleware');
 
-// Funcția 1: Adaugă notă
+// Funcția 1: Adaugă notă (cu poză opțională)
 exports.adaugaIntrare = async (req, res) => {
     const { membruId, rating, observatii } = req.body;
-    const azi = new Date().toISOString().split('T')[0]; 
+    const azi = new Date().toISOString().split('T')[0];
+    const pozaUrl = req.file ? req.file.path : null;
 
     try {
         await sequelize.query(
-            'INSERT INTO jurnalprogres (membruId, rating, observatii, dataIntrare) VALUES (?, ?, ?, ?)',
-            { replacements: [membruId, rating, observatii, azi] }
+            'INSERT INTO jurnalprogres (membruId, rating, observatii, dataIntrare, poza) VALUES (?, ?, ?, ?, ?)',
+            { replacements: [membruId, rating, observatii, azi, pozaUrl] }
         );
         res.json({ mesaj: 'Salvata cu succes!' });
     } catch (error) {
@@ -110,6 +112,18 @@ exports.getIstoricJurnal = async (req, res) => {
 exports.stergeIntrare = async (req, res) => {
     const { notaId } = req.params;
     try {
+        // Ștergem poza din Cloudinary dacă există
+        const [[intrare]] = await sequelize.query(
+            'SELECT poza FROM jurnalprogres WHERE id = ?',
+            { replacements: [notaId] }
+        );
+        if (intrare && intrare.poza) {
+            // Extragem public_id din URL-ul Cloudinary
+            const parts = intrare.poza.split('/');
+            const fileName = parts[parts.length - 1].split('.')[0];
+            const publicId = `glowguide-jurnal/${fileName}`;
+            await cloudinary.uploader.destroy(publicId).catch(() => {});
+        }
         await sequelize.query(
             'DELETE FROM jurnalprogres WHERE id = ?',
             { replacements: [notaId] }
@@ -123,11 +137,30 @@ exports.stergeIntrare = async (req, res) => {
 exports.editeazaIntrare = async (req, res) => {
     const { notaId } = req.params;
     const { rating, observatii } = req.body;
+    const pozaNoua = req.file ? req.file.path : null;
     try {
-        await sequelize.query(
-            'UPDATE jurnalprogres SET rating = ?, observatii = ? WHERE id = ?',
-            { replacements: [rating, observatii, notaId] }
-        );
+        if (pozaNoua) {
+            // Ștergem poza veche din Cloudinary
+            const [[intrare]] = await sequelize.query(
+                'SELECT poza FROM jurnalprogres WHERE id = ?',
+                { replacements: [notaId] }
+            );
+            if (intrare && intrare.poza) {
+                const parts = intrare.poza.split('/');
+                const fileName = parts[parts.length - 1].split('.')[0];
+                const publicId = `glowguide-jurnal/${fileName}`;
+                await cloudinary.uploader.destroy(publicId).catch(() => {});
+            }
+            await sequelize.query(
+                'UPDATE jurnalprogres SET rating = ?, observatii = ?, poza = ? WHERE id = ?',
+                { replacements: [rating, observatii, pozaNoua, notaId] }
+            );
+        } else {
+            await sequelize.query(
+                'UPDATE jurnalprogres SET rating = ?, observatii = ? WHERE id = ?',
+                { replacements: [rating, observatii, notaId] }
+            );
+        }
         res.json({ mesaj: 'Notă actualizată!' });
     } catch (error) {
         res.status(500).json({ eroare: 'Nu s-a putut edita.' });
