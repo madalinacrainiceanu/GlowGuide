@@ -17,6 +17,8 @@ export default function Jurnal() {
   const [rating, setRating] = useState(5);
   const [observatii, setObservatii] = useState('');
   const [mesaj, setMesaj] = useState('');
+  const [poza, setPoza] = useState(null);
+  const [previzualizarePoza, setPrevizualizarePoza] = useState(null);
   
   const [dateGrafic, setDateGrafic] = useState(null);
   const [istoric, setIstoric] = useState([]); 
@@ -25,6 +27,7 @@ export default function Jurnal() {
   const [editareId, setEditareId] = useState(null);
   const [ratingEdit, setRatingEdit] = useState(5);
   const [observatiiEdit, setObservatiiEdit] = useState('');
+  const [pozaEdit, setPozaEdit] = useState(null);
 
   const incarcaDateJurnal = async () => {
     if (!user) return;
@@ -77,16 +80,22 @@ export default function Jurnal() {
     setMesaj('');
 
     try {
-      await axios.post(`${API_URL}/api/jurnal/adauga`, { 
-          membruId: user.id, 
-          rating: rating, 
-          observatii: observatii 
+      const formData = new FormData();
+      formData.append('membruId', user.id);
+      formData.append('rating', rating);
+      formData.append('observatii', observatii);
+      if (poza) formData.append('poza', poza);
+
+      await axios.post(`${API_URL}/api/jurnal/adauga`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       });
       setMesaj('✅ Pagina de jurnal a fost salvată!');
       setObservatii(''); 
       setRating(5);
+      setPoza(null);
+      setPrevizualizarePoza(null);
       
-      incarcaDateJurnal(); // Reîncarcă imediat lista și graficul
+      incarcaDateJurnal();
       setTimeout(() => setMesaj(''), 3000);
     } catch (err) { 
       setMesaj('❌ Eroare la salvare.'); 
@@ -114,11 +123,16 @@ export default function Jurnal() {
 
   const salveazaEditare = async (idEditat) => {
       try {
-          await axios.put(`${API_URL}/api/jurnal/editeaza/${idEditat}`, {
-              rating: ratingEdit,
-              observatii: observatiiEdit
+          const formData = new FormData();
+          formData.append('rating', ratingEdit);
+          formData.append('observatii', observatiiEdit);
+          if (pozaEdit) formData.append('poza', pozaEdit);
+
+          await axios.put(`${API_URL}/api/jurnal/editeaza/${idEditat}`, formData, {
+              headers: { 'Content-Type': 'multipart/form-data' }
           });
-          setEditareId(null); 
+          setEditareId(null);
+          setPozaEdit(null);
           incarcaDateJurnal(); 
       } catch (e) { 
           console.log("Eroare la editare:", e); 
@@ -183,6 +197,23 @@ export default function Jurnal() {
                     onBlur={e => e.target.style.borderColor = '#e5e7eb'}
                     required />
               </div>
+              <div>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>📷 Poză (opțional)</label>
+                  <input type="file" accept="image/*" onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                          setPoza(file);
+                          setPrevizualizarePoza(URL.createObjectURL(file));
+                      }
+                  }} style={{ fontSize: '13px', color: '#555' }} />
+                  {previzualizarePoza && (
+                      <div style={{ marginTop: '10px', position: 'relative', display: 'inline-block' }}>
+                          <img src={previzualizarePoza} alt="preview" style={{ width: '100%', maxHeight: '160px', objectFit: 'cover', borderRadius: '10px', border: '1.5px solid #e5e7eb' }} />
+                          <button type="button" onClick={() => { setPoza(null); setPrevizualizarePoza(null); }}
+                              style={{ position: 'absolute', top: '6px', right: '6px', background: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', borderRadius: '50%', width: '24px', height: '24px', cursor: 'pointer', fontSize: '12px' }}>✕</button>
+                      </div>
+                  )}
+              </div>
               <button type="submit" style={{
                 padding: '13px', background: 'linear-gradient(135deg, #b06090, #6aab9e)',
                 color: 'white', border: 'none', borderRadius: '10px',
@@ -236,6 +267,11 @@ export default function Jurnal() {
                                       <input type="range" min="1" max="10" value={ratingEdit} onChange={(e) => setRatingEdit(parseInt(e.target.value))} style={{width: '60%', accentColor: '#b06090'}}/>
                                   </div>
                                   <textarea value={observatiiEdit} onChange={(e) => setObservatiiEdit(e.target.value)} rows="3" style={{width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #ccc'}} />
+                                  <div>
+                                      <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', display: 'block', marginBottom: '6px' }}>Schimba poza (optional)</label>
+                                      <input type="file" accept="image/*" onChange={(e) => { if(e.target.files[0]) setPozaEdit(e.target.files[0]); }} style={{ fontSize: '13px' }} />
+                                      {pozaEdit && <p style={{ fontSize: '12px', color: '#6aab9e', marginTop: '4px', marginBottom: 0 }}>Poza noua selectata</p>}
+                                  </div>
                                   
                                   <div style={{display: 'flex', gap: '10px'}}>
                                       <button onClick={() => salveazaEditare(intrare.id)} style={{padding: '8px 15px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>💾 Salvează</button>
@@ -266,6 +302,9 @@ export default function Jurnal() {
                                   <p style={{ margin: 0, color: '#444', fontSize: '17px', fontStyle: 'italic', fontFamily: "'Georgia', serif" }}>
                                       "{intrare.observatii}"
                                   </p>
+                                  {intrare.poza && (
+                                      <img src={intrare.poza} alt="poza jurnal" style={{ marginTop: '14px', width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '12px', border: '1.5px solid #e5e7eb' }} />
+                                  )}
                               </>
                           )}
                       </div>
