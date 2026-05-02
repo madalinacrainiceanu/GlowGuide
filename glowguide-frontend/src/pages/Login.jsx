@@ -29,13 +29,13 @@ export default function Login() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: 'linear-gradient(135deg, #f7f4f0 0%, #f0ede8 50%, #f5f0eb 100%)',
+      backgroundColor: '#faf8f6',
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px'
     }}>
       <div style={{ width: '100%', maxWidth: '420px' }}>
         {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{ fontSize: '52px', marginBottom: '8px' }}>🌸</div>
+          <div style={{ fontSize: '28px', marginBottom: '8px' }}>🌸</div>
           <h1 style={{ color: '#b06090', fontSize: '32px', fontWeight: '800', margin: 0, letterSpacing: '-1px' }}>GlowGuide</h1>
           <p style={{ color: '#999', marginTop: '6px', fontSize: '14px' }}>Rutina ta de îngrijire personalizată</p>
         </div>
@@ -46,7 +46,7 @@ export default function Login() {
           boxShadow: '0 20px 60px rgba(45,49,66,0.10)', padding: '36px'
         }}>
           <h2 style={{ color: '#222', fontSize: '20px', fontWeight: '700', marginBottom: '24px', textAlign: 'center' }}>
-            Bun venit înapoi ✨
+            Bun venit înapoi
           </h2>
 
           {eroare && (
@@ -55,7 +55,7 @@ export default function Login() {
               borderRadius: '10px', padding: '12px 16px', marginBottom: '16px',
               color: '#dc2626', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '8px'
             }}>
-              ❌ {eroare}
+              {eroare}
             </div>
           )}
 
@@ -93,7 +93,7 @@ export default function Login() {
               type="submit" disabled={loading}
               style={{
                 padding: '13px', marginTop: '4px',
-                background: loading ? '#d4b0c4' : 'linear-gradient(135deg, #b06090, #6aab9e)',
+                background: loading ? '#d4b0c4' : '#b06090',
                 color: 'white', border: 'none', borderRadius: '10px',
                 fontWeight: '700', fontSize: '15px', cursor: loading ? 'not-allowed' : 'pointer',
                 boxShadow: '0 4px 15px rgba(176,96,144,0.25)', transition: 'all 0.2s'

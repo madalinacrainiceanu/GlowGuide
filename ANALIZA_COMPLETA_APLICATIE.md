@@ -232,7 +232,8 @@ jurnalprogres (
   membruId INT NOT NULL,           -- FK → membru(id)
   rating INT,                      -- 1-10, nota tenului
   observatii TEXT,
-  dataIntrare DATE
+  dataIntrare DATE,
+  poza VARCHAR(500) NULL           -- URL imagine Cloudinary (opțional)
 )
 ```
 
@@ -523,9 +524,11 @@ ON DUPLICATE KEY UPDATE
 #### `adaugaIntrare`
 ```
 POST /api/jurnal/adauga
-Body: { membruId, rating, observatii }
+Body: multipart/form-data { membruId, rating, observatii, poza (opțional) }
 ```
-Salvează data curentă automat: `new Date().toISOString().split('T')[0]`
+- Dacă este atașată o imagine, aceasta este uploadată pe **Cloudinary** (folder `glowguide-jurnal`) prin middleware `multer-storage-cloudinary`
+- URL-ul imaginii returnate de Cloudinary este salvat în coloana `poza` din `jurnalprogres`
+- Dacă nu există imagine, `poza` este `NULL`
 
 #### `getEvolutie` — Cel mai complex endpoint
 ```
@@ -555,8 +558,10 @@ SELECT * FROM jurnalprogres WHERE membruId = ? ORDER BY id DESC
 ```
 DELETE /api/jurnal/sterge/:notaId
 PUT /api/jurnal/editeaza/:notaId
-Body: { rating, observatii }
+Body: multipart/form-data { rating, observatii, poza (opțional) }
 ```
+- La **ștergere**: dacă intrarea are o poză, aceasta este ștearsă și din Cloudinary (`cloudinary.uploader.destroy`)
+- La **editare**: dacă se trimite o poză nouă, poza veche este ștearsă din Cloudinary și înlocuită cu cea nouă
 
 #### `exportCSV`
 ```

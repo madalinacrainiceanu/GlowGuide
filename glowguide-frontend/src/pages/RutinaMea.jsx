@@ -58,18 +58,18 @@ export default function RutinaMea() {
 
         {/* HEADER */}
         <div style={{ marginBottom: '28px' }}>
-          <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>💆 Rutina Ta Personalizată</h1>
+          <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>Rutina Ta Personalizată</h1>
           <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>Produse selectate special pentru tipul tău de ten</p>
         </div>
 
         {/* Card CTA — doar dacă nu există rutină salvată */}
         {produse.length === 0 && (
           <div style={{
-            background: 'linear-gradient(135deg, #eef6f4, #d8ede8)',
-            borderRadius: '20px', padding: '40px', textAlign: 'center',
+            backgroundColor: '#e8f4f0',
+            borderRadius: '16px', padding: '40px', textAlign: 'center',
             marginBottom: '24px'
           }}>
-            <div style={{ fontSize: '56px', marginBottom: '16px' }}>🌸</div>
+            <div style={{ fontSize: '40px', marginBottom: '16px' }}>🧴</div>
             <p style={{ color: '#4a897e', marginBottom: '24px', fontSize: '15px', lineHeight: '1.6' }}>
               Sistemul nostru analizează profilul tău dermatologic pentru a-ți oferi cele mai potrivite produse.
             </p>
@@ -77,13 +77,12 @@ export default function RutinaMea() {
               onClick={genereazaRutina} disabled={loading}
               style={{
                 padding: '14px 36px',
-                background: loading ? '#d4b0c4' : 'linear-gradient(135deg, #b06090, #6aab9e)',
+                backgroundColor: loading ? '#d4b0c4' : '#b06090',
                 color: 'white', border: 'none', borderRadius: '12px',
                 fontSize: '16px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 6px 20px rgba(176,96,144,0.25)'
               }}
             >
-              {loading ? '⏳ Se calculează...' : '🔍 Generează Rutina Acum'}
+              {loading ? 'Se calculează...' : 'Generează Rutina'}
             </button>
             {eroare && (
               <div style={{ marginTop: '16px', color: '#dc2626', backgroundColor: '#fff5f5', padding: '12px', borderRadius: '10px', fontSize: '14px' }}>
@@ -96,8 +95,8 @@ export default function RutinaMea() {
         {/* Diagnostic */}
         {diagnostic && (
           <div style={{
-            background: 'linear-gradient(135deg, #eef6f4, #d8ede8)',
-            border: '2px solid #a8d5cc', padding: '20px 24px', borderRadius: '16px',
+            backgroundColor: '#e8f4f0',
+            border: '1px solid #a8d5cc', padding: '20px 24px', borderRadius: '16px',
             marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '16px'
           }}>
             <div style={{ fontSize: '40px' }}>📋</div>
@@ -122,7 +121,7 @@ export default function RutinaMea() {
                 border: '1.5px solid #b06090', borderRadius: '20px', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '600'
               }}>
-                {loading ? '⏳...' : '🔄 Actualizează'}
+                {loading ? '...' : 'Actualizează'}
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -135,11 +134,11 @@ export default function RutinaMea() {
                 }}>
                   <div style={{
                     width: '42px', height: '42px', borderRadius: '12px',
-                    background: 'linear-gradient(135deg, #eef6f4, #d8ede8)',
+                    backgroundColor: '#e8f4f0',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     fontSize: '20px', flexShrink: 0
                   }}>
-                    {EMOJI_CATEGORIE[produs.categorie?.toLowerCase()] || '✨'}
+                    {EMOJI_CATEGORIE[produs.categorie?.toLowerCase()] || '•'}
                   </div>
                   <div style={{ flex: 1 }}>
                     <p style={{ margin: '0 0 3px', fontSize: '11px', color: '#aaa', textTransform: 'uppercase', letterSpacing: '0.5px' }}>

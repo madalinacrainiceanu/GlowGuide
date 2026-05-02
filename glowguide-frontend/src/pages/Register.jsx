@@ -62,9 +62,9 @@ export default function Register() {
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', backgroundColor: '#f7f4f0', padding: '20px' }}>
       <div style={{ padding: '40px', backgroundColor: 'white', borderRadius: '15px', boxShadow: '0 4px 15px rgba(0,0,0,0.05)', width: '100%', maxWidth: '420px' }}>
         
-        <h2 style={{ textAlign: 'center', color: '#b06090', marginBottom: '6px' }}>✨ GlowGuide</h2>
+        <h2 style={{ textAlign: 'center', color: '#b06090', marginBottom: '6px' }}>GlowGuide</h2>
         <p style={{ textAlign: 'center', color: '#888', fontSize: '13px', marginBottom: '24px' }}>
-          {pas === 1 ? 'Creează-ți contul 🌸' : `Introdu codul primit pe ${email}`}
+          {pas === 1 ? 'Creează-ți contul' : `Introdu codul primit pe ${email}`}
         </p>
 
         {/* Indicator pași */}
@@ -79,12 +79,12 @@ export default function Register() {
 
         {eroare && (
           <p style={{ color: '#c0392b', fontSize: '13px', marginBottom: '12px', backgroundColor: '#fff5f5', padding: '10px', borderRadius: '8px', textAlign: 'center' }}>
-            ❌ {eroare}
+            {eroare}
           </p>
         )}
         {succes && (
           <p style={{ color: '#27ae60', fontSize: '13px', marginBottom: '12px', backgroundColor: '#f0fff4', padding: '10px', borderRadius: '8px', textAlign: 'center' }}>
-            ✅ {succes}
+            {succes}
           </p>
         )}
 
@@ -103,7 +103,7 @@ export default function Register() {
               color: 'white', border: 'none', borderRadius: '8px',
               fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '15px'
             }}>
-              {loading ? 'Se trimite codul...' : 'Trimite cod de verificare 📧'}
+              {loading ? 'Se trimite codul...' : 'Trimite cod de verificare'}
             </button>
           </form>
         )}
@@ -128,7 +128,7 @@ export default function Register() {
               color: 'white', border: 'none', borderRadius: '8px',
               fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '15px'
             }}>
-              {loading ? 'Se verifică...' : 'Verifică și creează cont ✅'}
+              {loading ? 'Se verifică...' : 'Verifică și creează cont'}
             </button>
             <button type="button" onClick={() => { setPas(1); setEroare(''); setSucces(''); }} style={{
               padding: '10px', backgroundColor: 'transparent', color: '#b06090',

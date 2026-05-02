@@ -90,7 +90,7 @@ export default function Jurnal() {
       await axios.post(`${API_URL}/api/jurnal/adauga`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setMesaj('✅ Pagina de jurnal a fost salvată!');
+              setMesaj('Pagina de jurnal a fost salvată!');
       setObservatii(''); 
       setRating(5);
       setPoza(null);
@@ -99,7 +99,7 @@ export default function Jurnal() {
       incarcaDateJurnal();
       setTimeout(() => setMesaj(''), 3000);
     } catch (err) { 
-      setMesaj('❌ Eroare la salvare.'); 
+      setMesaj('Eroare la salvare.'); 
     }
   };
 
@@ -156,7 +156,7 @@ export default function Jurnal() {
         {/* HEADER */}
         <div style={{ marginBottom: '28px', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '12px' }}>
           <div>
-            <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>📔 Jurnalul Meu</h1>
+            <h1 style={{ color: '#b06090', margin: '0 0 6px', fontSize: '26px', fontWeight: '800' }}>Jurnalul Meu</h1>
             <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>Urmărește evoluția tenului și notează observațiile zilnice</p>
           </div>
           <a
@@ -178,7 +178,7 @@ export default function Jurnal() {
           
           {/* FORMULAR ADAUGARE */}
           <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-              <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>✍️ Scrie o filă nouă</h3>
+              <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>Scrie o filă nouă</h3>
               <form onSubmit={adaugaIntrare} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
                   <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'flex', justifyContent: 'space-between' }}>
@@ -201,7 +201,7 @@ export default function Jurnal() {
                     required />
               </div>
               <div>
-                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>📷 Poză (opțional)</label>
+                  <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block', marginBottom: '8px' }}>Poză (opțional)</label>
                   <input type="file" accept="image/*" onChange={(e) => {
                       const file = e.target.files[0];
                       if (file) {
@@ -218,20 +218,19 @@ export default function Jurnal() {
                   )}
               </div>
               <button type="submit" style={{
-                padding: '13px', background: 'linear-gradient(135deg, #b06090, #6aab9e)',
+                padding: '13px', backgroundColor: '#b06090',
                 color: 'white', border: 'none', borderRadius: '10px',
                 fontWeight: '700', fontSize: '15px', cursor: 'pointer',
-                boxShadow: '0 4px 15px rgba(176,96,144,0.25)'
               }}>
-                  ✨ Salvează în Jurnal
+                  Salvează în Jurnal
               </button>
               </form>
-              {mesaj && <div style={{ marginTop: '14px', padding: '12px', backgroundColor: mesaj.includes('✅') ? '#f0fdf4' : '#fff5f5', color: mesaj.includes('✅') ? '#16a34a' : '#dc2626', borderRadius: '10px', textAlign: 'center', fontWeight: '600', fontSize: '13px' }}>{mesaj}</div>}
+              {mesaj && <div style={{ marginTop: '14px', padding: '12px', backgroundColor: mesaj.includes('salvată') ? '#f0fdf4' : '#fff5f5', color: mesaj.includes('salvată') ? '#16a34a' : '#dc2626', borderRadius: '10px', textAlign: 'center', fontWeight: '600', fontSize: '13px' }}>{mesaj}</div>}
           </div>
 
           {/* GRAFIC */}
           <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
-              <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>📈 Evoluție Ten</h3>
+              <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>Evoluție Ten</h3>
               {dateGrafic ? (
               <div style={{ width: '100%', height: '260px' }}>
                   <Line ref={chartRef} options={{ responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, max: 10, grid: { color: '#f5f5f5' } } }, plugins: { legend: { display: false } } }} data={dateGrafic} />
@@ -247,7 +246,7 @@ export default function Jurnal() {
 
       {/* AGENDA */}
       <div style={{ marginTop: '32px' }}>
-          <h2 style={{ color: '#222', marginBottom: '20px', fontSize: '18px' }}>📚 Filele Jurnalului</h2>
+          <h2 style={{ color: '#222', marginBottom: '20px', fontSize: '18px' }}>Filele Jurnalului</h2>
           
           {istoric.length === 0 ? (
               <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '20px', textAlign: 'center', color: '#bbb', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
@@ -283,8 +282,8 @@ export default function Jurnal() {
                                   </div>
                                   
                                   <div style={{display: 'flex', gap: '10px'}}>
-                                      <button onClick={() => salveazaEditare(intrare.id)} style={{padding: '8px 15px', backgroundColor: '#4CAF50', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>💾 Salvează</button>
-                                      <button onClick={() => setEditareId(null)} style={{padding: '8px 15px', backgroundColor: '#f44336', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>❌ Anulează</button>
+                                      <button onClick={() => salveazaEditare(intrare.id)} style={{padding: '8px 15px', backgroundColor: '#6aab9e', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>Salvează</button>
+                                      <button onClick={() => setEditareId(null)} style={{padding: '8px 15px', backgroundColor: 'white', color: '#888', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold'}}>Anulează</button>
                                   </div>
                               </div>
                           ) : (
