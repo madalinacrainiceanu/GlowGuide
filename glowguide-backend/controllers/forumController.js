@@ -1,23 +1,16 @@
 const sequelize = require('../db');
-const axios = require('axios');
+const nodemailer = require('nodemailer');
 
-const trimiteEmailResend = async (catre, subiect, html) => {
-    try {
-        await axios.post('https://api.resend.com/emails', {
-            from: 'GlowGuide <onboarding@resend.dev>',
-            to: [catre],
-            subject: subiect,
-            html: html
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
-    } catch (e) {
-        console.error('Email notificare:', e.response?.data || e.message);
-    }
-};
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    tls: { rejectUnauthorized: false }
+});
 
 // --- PENTRU MEMBRI ---
 
@@ -187,7 +180,11 @@ exports.modereazaPostare = async (req, res) => {
             );
             if (rows.length > 0) {
                 const { titlu, prenume, email } = rows[0];
-                await trimiteEmailResend(email, '✅ Postarea ta a fost aprobată!', `
+                transporter.sendMail({
+                    from: `"GlowGuide 🌸" <${process.env.EMAIL_USER}>`,
+                    to: email,
+                    subject: '✅ Postarea ta a fost aprobată!',
+                    html: `
                         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; background: #fffafb; border-radius: 15px;">
                             <h2 style="color: #b06090; text-align: center;">🌸 GlowGuide</h2>
                             <p>Bună, <strong>${prenume}</strong>!</p>
@@ -199,7 +196,8 @@ exports.modereazaPostare = async (req, res) => {
                             </div>
                             <p style="color: #888; font-size: 13px;">Echipa GlowGuide 💕</p>
                         </div>
-                    `);
+                    `
+                }).catch(e => console.error('Email notificare:', e.message));
             }
         }
 

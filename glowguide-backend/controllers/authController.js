@@ -1,25 +1,23 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const axios = require('axios');
+const nodemailer = require('nodemailer');
 const sequelize = require('../db'); 
 
 // Stocare temporară coduri de verificare (în memorie — se resetează la repornirea serverului)
 const coduriVerificare = {};
 
-// Trimitere email prin Resend HTTP API
-const trimiteEmailResend = async (catre, subiect, html) => {
-    await axios.post('https://api.resend.com/emails', {
-        from: 'GlowGuide <onboarding@resend.dev>',
-        to: [catre],
-        subject: subiect,
-        html: html
-    }, {
-        headers: {
-            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
-            'Content-Type': 'application/json'
-        }
-    });
-};
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    },
+    tls: {
+        rejectUnauthorized: false
+    }
+});
 
 // --- PASUL 1: TRIMITE COD DE VERIFICARE PE EMAIL ---
 exports.trimiteCodum = async (req, res) => {
@@ -48,7 +46,11 @@ exports.trimiteCodum = async (req, res) => {
         };
 
         // Trimitem emailul
-        await trimiteEmailResend(email, 'Cod de verificare GlowGuide', `
+        await transporter.sendMail({
+            from: `"GlowGuide 🌸" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Cod de verificare GlowGuide',
+            html: `
                 <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; background: #fffafb; border-radius: 15px;">
                     <h2 style="color: #d63384; text-align: center;">✨ GlowGuide</h2>
                     <p>Bună, <strong>${prenume}</strong>!</p>
@@ -58,7 +60,8 @@ exports.trimiteCodum = async (req, res) => {
                     </div>
                     <p style="color: #888; font-size: 13px;">Codul este valabil <strong>10 minute</strong>. Dacă nu ai solicitat tu crearea unui cont, ignoră acest email.</p>
                 </div>
-            `);
+            `
+        });
 
         res.json({ mesaj: 'Cod trimis pe email! Verifică inbox-ul.' });
 
