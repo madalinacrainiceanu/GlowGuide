@@ -19,12 +19,17 @@ export default function RutinaMea() {
   const [loading, setLoading] = useState(false);
   const [eroare, setEroare] = useState('');
 
-  const genereazaRutina = async () => {
+  const genereazaRutina = async (regenereaza = false) => {
     if (!user) return;
     setLoading(true);
     setEroare('');
     try {
-      const raspuns = await axios.post(`${API_URL}/api/rutina/genereaza`, { membruId: user.id });
+      const payload = { membruId: user.id };
+      if (regenereaza && produse.length > 0) {
+        payload.regenereaza = true;
+        payload.produseActuale = produse.map(p => ({ categorie: p.categorie, produsId: p.id }));
+      }
+      const raspuns = await axios.post(`${API_URL}/api/rutina/genereaza`, payload);
       const produsePrimite = raspuns.data.produse;
       const diagnosticPrimit = raspuns.data.profilUtilizator;
       const data = new Date().toLocaleDateString('ro-RO', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -125,7 +130,7 @@ export default function RutinaMea() {
             )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, color: '#222', fontSize: '17px' }}>Rutina zilnică — {produse.length} {produse.length === 1 ? 'pas' : 'pași'}</h3>
-              <button onClick={genereazaRutina} disabled={loading} style={{
+              <button onClick={() => genereazaRutina(true)} disabled={loading} style={{
                 padding: '8px 16px', backgroundColor: 'white', color: '#b06090',
                 border: '1.5px solid #b06090', borderRadius: '20px', cursor: 'pointer',
                 fontSize: '13px', fontWeight: '600'

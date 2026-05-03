@@ -2,7 +2,7 @@ const sequelize = require('../db');
 
 exports.genereazaRutina = async (req, res) => {
     // Luăm id-ul membrului trimis de frontend
-    const { membruId } = req.body; 
+    const { membruId, regenereaza, produseActuale } = req.body; 
 
     try {
         // 1. Obținem profilul dermatologic al membrului din baza de date
@@ -59,22 +59,57 @@ exports.genereazaRutina = async (req, res) => {
                 replacements.push(...alergeniArray);
             }
 
-            // Query-ul principal de căutare
-            const queryText = `
-                SELECT DISTINCT p.id, p.nume, p.brand, p.categorie, p.rating
-                FROM produs p
-                WHERE p.categorie = ?
-                  AND p.tipTenRecomandat LIKE ?
-                  ${excludereAlergeniSql}
-                ORDER BY p.rating DESC
-                LIMIT 1
-            `;
+            let produsAles = null;
 
-            const [produsGasit] = await sequelize.query(queryText, { replacements });
+            if (regenereaza && produseActuale) {
+                // La actualizare: caută un produs diferit față de cel curent
+                const produsActual = produseActuale.find(p => p.categorie === categorie);
+                const excludeId = produsActual ? produsActual.produsId : null;
+
+                if (excludeId) {
+                    const queryUrmatorul = `
+                        SELECT DISTINCT p.id, p.nume, p.brand, p.categorie, p.rating
+                        FROM produs p
+                        WHERE p.categorie = ?
+                          AND p.tipTenRecomandat LIKE ?
+                          AND p.id != ?
+                          ${excludereAlergeniSql}
+                        ORDER BY p.rating DESC
+                        LIMIT 1
+                    `;
+                    const replacementsUrmatorul = [categorie, `%${tipTenUser}%`, excludeId, ...alergeniArray];
+                    const [urmatorul] = await sequelize.query(queryUrmatorul, { replacements: replacementsUrmatorul });
+
+                    if (urmatorul.length > 0) {
+                        produsAles = urmatorul[0];
+                    } else {
+                        // Nu există alt produs → păstrăm același
+                        const queryAcelasiSql = `
+                            SELECT DISTINCT p.id, p.nume, p.brand, p.categorie, p.rating
+                            FROM produs p WHERE p.id = ?
+                        `;
+                        const [acelasi] = await sequelize.query(queryAcelasiSql, { replacements: [excludeId] });
+                        if (acelasi.length > 0) produsAles = acelasi[0];
+                    }
+                }
+            } else {
+                // Prima generare: cel mai bun produs după rating
+                const queryText = `
+                    SELECT DISTINCT p.id, p.nume, p.brand, p.categorie, p.rating
+                    FROM produs p
+                    WHERE p.categorie = ?
+                      AND p.tipTenRecomandat LIKE ?
+                      ${excludereAlergeniSql}
+                    ORDER BY p.rating DESC
+                    LIMIT 1
+                `;
+                const [produsGasit] = await sequelize.query(queryText, { replacements });
+                if (produsGasit.length > 0) produsAles = produsGasit[0];
+            }
 
             // Dacă baza de date a găsit un produs bun, îl adăugăm la lista finală
-            if (produsGasit.length > 0) {
-                produseRecomandate.push(produsGasit[0]);
+            if (produsAles) {
+                produseRecomandate.push(produsAles);
             }
         }
 
