@@ -56,7 +56,7 @@ exports.genereazaRutina = async (req, res) => {
                         WHERE pi.produsId = p.id AND i.nume IN (${placeholders})
                     )
                 `;
-                replacements.push(...alergeniArray); // adăugăm alergenii în variabilele interogării
+                replacements.push(...alergeniArray);
             }
 
             // Query-ul principal de căutare

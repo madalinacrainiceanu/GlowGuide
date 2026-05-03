@@ -114,8 +114,17 @@ export default function RutinaMea() {
         {/* Lista produse */}
         {produse.length > 0 && (
           <>
+            {produse.length < 5 && (
+              <div style={{
+                backgroundColor: '#fef9e7', border: '1px solid #f0d080',
+                borderRadius: '12px', padding: '12px 18px', marginBottom: '16px',
+                fontSize: '13px', color: '#a07020', lineHeight: '1.5'
+              }}>
+                Rutina ta conține {produse.length} produse potrivite tipului tău de ten din baza de date actuală. Baza de date se actualizează continuu cu produse noi.
+              </div>
+            )}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, color: '#222', fontSize: '17px' }}>Rutina zilnică — {produse.length} pași</h3>
+              <h3 style={{ margin: 0, color: '#222', fontSize: '17px' }}>Rutina zilnică — {produse.length} {produse.length === 1 ? 'pas' : 'pași'}</h3>
               <button onClick={genereazaRutina} disabled={loading} style={{
                 padding: '8px 16px', backgroundColor: 'white', color: '#b06090',
                 border: '1.5px solid #b06090', borderRadius: '20px', cursor: 'pointer',
