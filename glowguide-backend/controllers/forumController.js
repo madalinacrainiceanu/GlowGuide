@@ -1,10 +1,23 @@
 const sequelize = require('../db');
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-});
+const trimiteEmailBrevo = async (catre, subiect, html) => {
+    try {
+        await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: { name: 'GlowGuide 🌸', email: process.env.EMAIL_USER },
+            to: [{ email: catre }],
+            subject: subiect,
+            htmlContent: html
+        }, {
+            headers: {
+                'api-key': process.env.BREVO_API_KEY,
+                'Content-Type': 'application/json'
+            }
+        });
+    } catch (e) {
+        console.error('Email notificare:', e.message);
+    }
+};
 
 // --- PENTRU MEMBRI ---
 
@@ -174,24 +187,19 @@ exports.modereazaPostare = async (req, res) => {
             );
             if (rows.length > 0) {
                 const { titlu, prenume, email } = rows[0];
-                transporter.sendMail({
-                    from: `"GlowGuide 🌸" <${process.env.EMAIL_USER}>`,
-                    to: email,
-                    subject: '✅ Postarea ta a fost aprobată!',
-                    html: `
+                await trimiteEmailBrevo(email, '✅ Postarea ta a fost aprobată!', `
                         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; background: #fffafb; border-radius: 15px;">
                             <h2 style="color: #b06090; text-align: center;">🌸 GlowGuide</h2>
                             <p>Bună, <strong>${prenume}</strong>!</p>
                             <p>Postarea ta <strong>"${titlu}"</strong> a fost aprobată și este acum vizibilă în comunitate! 🎉</p>
                             <div style="text-align: center; margin: 24px 0;">
-                                <a href="http://localhost:5173/forum" style="background: linear-gradient(135deg, #b06090, #6aab9e); color: white; padding: 12px 28px; border-radius: 10px; text-decoration: none; font-weight: bold;">
+                                <a href="https://licenta-theta.vercel.app/forum" style="background: #b06090; color: white; padding: 12px 28px; border-radius: 10px; text-decoration: none; font-weight: bold;">
                                     Vezi postarea →
                                 </a>
                             </div>
                             <p style="color: #888; font-size: 13px;">Echipa GlowGuide 💕</p>
                         </div>
-                    `
-                }).catch(e => console.error('Email notificare:', e.message));
+                    `);
             }
         }
 
