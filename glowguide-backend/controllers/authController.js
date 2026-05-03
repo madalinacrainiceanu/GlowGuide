@@ -63,7 +63,7 @@ exports.trimiteCodum = async (req, res) => {
         res.json({ mesaj: 'Cod trimis pe email! Verifică inbox-ul.' });
 
     } catch (error) {
-        console.error('Eroare trimitere email:', error);
+        console.error('Eroare trimitere email:', error.response?.data || error.message);
         res.status(500).json({ eroare: 'Eroare la trimiterea email-ului. Încearcă din nou.' });
     }
 };
