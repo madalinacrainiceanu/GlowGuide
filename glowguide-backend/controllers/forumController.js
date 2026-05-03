@@ -1,21 +1,21 @@
 const sequelize = require('../db');
 const axios = require('axios');
 
-const trimiteEmailBrevo = async (catre, subiect, html) => {
+const trimiteEmailResend = async (catre, subiect, html) => {
     try {
-        await axios.post('https://api.brevo.com/v3/smtp/email', {
-            sender: { name: 'GlowGuide 🌸', email: process.env.EMAIL_USER },
-            to: [{ email: catre }],
+        await axios.post('https://api.resend.com/emails', {
+            from: 'GlowGuide <onboarding@resend.dev>',
+            to: [catre],
             subject: subiect,
-            htmlContent: html
+            html: html
         }, {
             headers: {
-                'api-key': process.env.BREVO_API_KEY,
+                'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
                 'Content-Type': 'application/json'
             }
         });
     } catch (e) {
-        console.error('Email notificare:', e.message);
+        console.error('Email notificare:', e.response?.data || e.message);
     }
 };
 
@@ -187,7 +187,7 @@ exports.modereazaPostare = async (req, res) => {
             );
             if (rows.length > 0) {
                 const { titlu, prenume, email } = rows[0];
-                await trimiteEmailBrevo(email, '✅ Postarea ta a fost aprobată!', `
+                await trimiteEmailResend(email, '✅ Postarea ta a fost aprobată!', `
                         <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; background: #fffafb; border-radius: 15px;">
                             <h2 style="color: #b06090; text-align: center;">🌸 GlowGuide</h2>
                             <p>Bună, <strong>${prenume}</strong>!</p>

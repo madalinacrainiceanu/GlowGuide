@@ -6,16 +6,16 @@ const sequelize = require('../db');
 // Stocare temporară coduri de verificare (în memorie — se resetează la repornirea serverului)
 const coduriVerificare = {};
 
-// Trimitere email prin Brevo HTTP API
-const trimiteEmailBrevo = async (catre, subiect, html) => {
-    await axios.post('https://api.brevo.com/v3/smtp/email', {
-        sender: { name: 'GlowGuide 🌸', email: process.env.EMAIL_USER },
-        to: [{ email: catre }],
+// Trimitere email prin Resend HTTP API
+const trimiteEmailResend = async (catre, subiect, html) => {
+    await axios.post('https://api.resend.com/emails', {
+        from: 'GlowGuide <onboarding@resend.dev>',
+        to: [catre],
         subject: subiect,
-        htmlContent: html
+        html: html
     }, {
         headers: {
-            'api-key': process.env.BREVO_API_KEY,
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
             'Content-Type': 'application/json'
         }
     });
@@ -48,7 +48,7 @@ exports.trimiteCodum = async (req, res) => {
         };
 
         // Trimitem emailul
-        await trimiteEmailBrevo(email, 'Cod de verificare GlowGuide', `
+        await trimiteEmailResend(email, 'Cod de verificare GlowGuide', `
                 <div style="font-family: Arial, sans-serif; max-width: 500px; margin: 0 auto; padding: 30px; background: #fffafb; border-radius: 15px;">
                     <h2 style="color: #d63384; text-align: center;">✨ GlowGuide</h2>
                     <p>Bună, <strong>${prenume}</strong>!</p>
