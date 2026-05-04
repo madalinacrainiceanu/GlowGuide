@@ -6,7 +6,7 @@ import API_URL from '../api';
 
 const INTREBARI_RAPIDE = [
   'În ce ordine aplic produsele?',
-  'Ce este niacinamide?',
+  'Ce este niacinamida?',
   'Cât de des folosesc retinolul?',
   'Trebuie SPF și în zilele înnorate?',
   'Tenul gras are nevoie de hidratant?',
