@@ -117,17 +117,18 @@ exports.stergeIntrare = async (req, res) => {
             'SELECT poza FROM jurnalprogres WHERE id = ?',
             { replacements: [notaId] }
         );
+        // Ștergem mai întâi din DB — dacă eșuează, poza rămâne intactă în cloud
+        await sequelize.query(
+            'DELETE FROM jurnalprogres WHERE id = ?',
+            { replacements: [notaId] }
+        );
+        // Abia după confirmarea ștergerii din DB, ștergem poza din Cloudinary
         if (intrare && intrare.poza) {
-            // Extragem public_id din URL-ul Cloudinary
             const parts = intrare.poza.split('/');
             const fileName = parts[parts.length - 1].split('.')[0];
             const publicId = `glowguide-jurnal/${fileName}`;
             await cloudinary.uploader.destroy(publicId).catch(() => {});
         }
-        await sequelize.query(
-            'DELETE FROM jurnalprogres WHERE id = ?',
-            { replacements: [notaId] }
-        );
         res.json({ mesaj: 'Notă ștearsă cu succes!' });
     } catch (error) {
         res.status(500).json({ eroare: 'Nu s-a putut șterge.' });

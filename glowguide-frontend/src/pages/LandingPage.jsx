@@ -4,7 +4,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ backgroundColor: '#faf8f6', minHeight: '100vh', fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+    <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
 
       {/* NAVBAR */}
       <nav style={{

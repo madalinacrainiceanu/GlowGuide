@@ -26,13 +26,13 @@ export default function ProfilPublic() {
   }, [membruId]);
 
   if (loading) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: '#b06090' }}>Se încarcă...</p>
     </div>
   );
 
   if (eroare) return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Navbar />
       <div style={{ maxWidth: '600px', margin: '60px auto', textAlign: 'center' }}>
         <div style={{ fontSize: '48px', marginBottom: '16px' }}>😔</div>
@@ -48,7 +48,7 @@ export default function ProfilPublic() {
     : '—';
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Navbar />
       <div style={{ maxWidth: '680px', margin: '0 auto', padding: '32px 20px' }}>
 

@@ -60,7 +60,7 @@ export default function DetaliiPostare() {
   if (!postare) return <div style={{ textAlign: 'center', marginTop: '80px', color: '#888' }}>Postarea nu a fost găsită.</div>;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Navbar />
       <div style={{ maxWidth: '750px', margin: '0 auto', padding: '32px 20px' }}>
 

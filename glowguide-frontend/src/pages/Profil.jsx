@@ -170,7 +170,7 @@ export default function Profil() {
   // --- ECRAN REZULTAT ---
   if (pas === INTREBARI.length + 1 && rezultatFinal) {
     return (
-      <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
         <Navbar />
         <div style={{ maxWidth: '560px', margin: '0 auto', padding: '60px 20px', textAlign: 'center' }}>
           <div style={{ fontSize: '48px', marginBottom: '20px' }}>🧬</div>
@@ -189,7 +189,7 @@ export default function Profil() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Navbar />
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '40px 20px' }}>
 

@@ -9,8 +9,22 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [badgeAdmin, setBadgeAdmin] = useState(0);
 
-  const userData = localStorage.getItem('user');
+  // Dark mode: urmărește tema din localStorage prin eveniment custom
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('darkMode') === 'true');
+  // User: urmărește datele actualizate din localStorage (ex: după editare nume)
+  const [userData, setUserData] = useState(() => localStorage.getItem('user'));
   const user = userData ? JSON.parse(userData) : null;
+
+  useEffect(() => {
+    const themeHandler = () => setDarkMode(localStorage.getItem('darkMode') === 'true');
+    const userHandler = () => setUserData(localStorage.getItem('user'));
+    window.addEventListener('glowguide-theme-change', themeHandler);
+    window.addEventListener('glowguide-user-update', userHandler);
+    return () => {
+      window.removeEventListener('glowguide-theme-change', themeHandler);
+      window.removeEventListener('glowguide-user-update', userHandler);
+    };
+  }, []);
 
   useEffect(() => {
     if (user?.rol === 'admin') {
@@ -40,7 +54,7 @@ export default function Navbar() {
   return (
     <>
       <nav style={{
-        backgroundColor: 'white',
+        backgroundColor: darkMode ? '#16213e' : 'white',
         boxShadow: '0 2px 12px rgba(45,49,66,0.08)',
         position: 'sticky',
         top: 0,
@@ -81,7 +95,7 @@ export default function Navbar() {
                   fontSize: '13px',
                   fontWeight: isActive(l.path) ? '700' : '500',
                   backgroundColor: isActive(l.path) ? '#f7eef4' : 'transparent',
-                  color: isActive(l.path) ? '#b06090' : '#7a7a8c',
+                  color: isActive(l.path) ? '#b06090' : (darkMode ? '#c0b8d0' : '#7a7a8c'),
                   transition: 'all 0.2s',
                 }}
               >
@@ -165,7 +179,8 @@ export default function Navbar() {
         {/* Meniu mobil */}
         {menuOpen && (
           <div style={{
-            borderTop: '1px solid #e8e3dc',
+            borderTop: `1px solid ${darkMode ? '#2a2a4a' : '#e8e3dc'}`,
+            backgroundColor: darkMode ? '#16213e' : 'white',
             padding: '12px 0',
             display: 'flex',
             flexDirection: 'column',
@@ -183,7 +198,7 @@ export default function Navbar() {
                   fontSize: '15px',
                   fontWeight: isActive(l.path) ? '700' : '500',
                   backgroundColor: isActive(l.path) ? '#f7eef4' : 'transparent',
-                  color: isActive(l.path) ? '#b06090' : '#2d3142',
+                  color: isActive(l.path) ? '#b06090' : (darkMode ? '#c0b8d0' : '#2d3142'),
                   textAlign: 'left',
                 }}
               >

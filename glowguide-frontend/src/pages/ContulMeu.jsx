@@ -56,6 +56,7 @@ export default function ContulMeu() {
   useEffect(() => {
     document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
     localStorage.setItem('darkMode', darkMode);
+    window.dispatchEvent(new Event('glowguide-theme-change'));
   }, [darkMode]);
 
   const salveazaNume = async () => {
@@ -64,6 +65,10 @@ export default function ContulMeu() {
         membruId: user.id, numeNou, prenumeNou
       });
       setCont(prev => ({ ...prev, nume: numeNou, prenume: prenumeNou }));
+      // Actualizează și obiectul user din localStorage + notifică Navbar-ul
+      const userActualizat = { ...user, nume: numeNou, prenume: prenumeNou };
+      localStorage.setItem('user', JSON.stringify(userActualizat));
+      window.dispatchEvent(new Event('glowguide-user-update'));
       setMesajNume('✅ Numele a fost actualizat!');
       setEditNume(false);
       setTimeout(() => setMesajNume(''), 3000);
