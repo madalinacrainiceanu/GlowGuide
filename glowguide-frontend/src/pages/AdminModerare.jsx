@@ -57,7 +57,7 @@ export default function AdminModerare() {
   if (!user || user.rol !== 'admin') return null;
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Navbar />
       <div style={{ maxWidth: '850px', margin: '0 auto', padding: '32px 20px' }}>
 

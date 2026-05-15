@@ -36,10 +36,14 @@ exports.trimiteCodum = async (req, res) => {
         // Generăm cod de 6 cifre
         const cod = Math.floor(100000 + Math.random() * 900000).toString();
 
+        // Hash-uim parola înainte de stocare în memorie (securitate)
+        const salt = await bcrypt.genSalt(10);
+        const parolaHash = await bcrypt.hash(parola, salt);
+
         // Salvăm codul + datele temporar (expiră în 10 minute)
         coduriVerificare[email] = {
             cod,
-            parola,
+            parola: parolaHash,
             nume,
             prenume,
             expira: Date.now() + 10 * 60 * 1000
@@ -89,11 +93,8 @@ exports.verificaCod = async (req, res) => {
     }
 
     try {
-        const { parola, nume, prenume } = datePendinte;
-
-        // Hash parola
-        const salt = await bcrypt.genSalt(10);
-        const parolaHash = await bcrypt.hash(parola, salt);
+        const { parola: parolaHash, nume, prenume } = datePendinte;
+        // Parola este deja hash-uită din pasul trimiteCodum — o folosim direct
 
         // Inserare utilizator
         const [resultUtilizator] = await sequelize.query(
@@ -118,43 +119,6 @@ exports.verificaCod = async (req, res) => {
         res.status(500).json({ eroare: 'Eroare la crearea contului.' });
     }
 };
-
-// --- ÎNREGISTRARE DIRECTĂ (păstrată pentru compatibilitate) ---
-exports.register = async (req, res) => {
-    const { email, parola, nume, prenume } = req.body;
-
-    try {
-        const [userExistent] = await sequelize.query(
-            'SELECT * FROM utilizator WHERE email = ?',
-            { replacements: [email] }
-        );
-
-        if (userExistent.length > 0) {
-            return res.status(400).json({ eroare: 'Email-ul este deja folosit!' });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const parolaHash = await bcrypt.hash(parola, salt);
-
-        const [resultUtilizator] = await sequelize.query(
-            `INSERT INTO utilizator (email, parola, rol) VALUES (?, ?, 'membru')`,
-            { replacements: [email, parolaHash] }
-        );
-        const utilizatorId = resultUtilizator;
-
-        await sequelize.query(
-            `INSERT INTO membru (utilizatorId, nume, prenume) VALUES (?, ?, ?)`,
-            { replacements: [utilizatorId, nume, prenume] }
-        );
-
-        res.status(201).json({ mesaj: 'Cont creat cu succes!' });
-
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ eroare: 'Eroare la server în timpul înregistrării.' });
-    }
-};
-
 
 // --- ÎNREGISTRARE DIRECTĂ (păstrată pentru compatibilitate) ---
 exports.register = async (req, res) => {

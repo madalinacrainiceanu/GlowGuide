@@ -149,7 +149,7 @@ export default function Jurnal() {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#f7f4f0' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: 'var(--bg)' }}>
       <Navbar />
       <div style={{ maxWidth: '900px', margin: '0 auto', padding: '32px 20px' }}>
 

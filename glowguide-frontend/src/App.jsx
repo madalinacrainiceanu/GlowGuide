@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import LandingPage from './pages/LandingPage';
@@ -15,6 +16,11 @@ import ProfilPublic from './pages/ProfilPublic';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('darkMode') === 'true';
+    document.body.setAttribute('data-theme', savedTheme ? 'dark' : 'light');
+  }, []);
+
   return (
     <Router>
       <Routes>
@@ -27,7 +33,7 @@ function App() {
         <Route path="/jurnal" element={<ProtectedRoute><Jurnal /></ProtectedRoute>} />
         <Route path="/forum" element={<ProtectedRoute><Forum /></ProtectedRoute>} />
         <Route path="/forum/:id" element={<ProtectedRoute><DetaliiPostare /></ProtectedRoute>} />
-        <Route path="/admin/moderare" element={<ProtectedRoute><AdminModerare /></ProtectedRoute>} />
+        <Route path="/admin/moderare" element={<ProtectedRoute adminOnly><AdminModerare /></ProtectedRoute>} />
         <Route path="/chatbot" element={<ProtectedRoute><Chatbot /></ProtectedRoute>} />
         <Route path="/cont" element={<ProtectedRoute><ContulMeu /></ProtectedRoute>} />
         <Route path="/profil-public/:membruId" element={<ProtectedRoute><ProfilPublic /></ProtectedRoute>} />
