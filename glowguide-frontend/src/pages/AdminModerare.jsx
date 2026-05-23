@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Chart as ChartJS, ArcElement, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler } from 'chart.js';
+import { Pie, Bar, Line } from 'react-chartjs-2';
 import Navbar from '../components/Navbar';
 import API_URL from '../api';
+
+ChartJS.register(ArcElement, BarElement, CategoryScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
 
 export default function AdminModerare() {
   const navigate = useNavigate();
@@ -12,6 +16,11 @@ export default function AdminModerare() {
   const [postariInAsteptare, setPostariInAsteptare] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mesaje, setMesaje] = useState({});
+  const [statsTipuriTen, setStatsTipuriTen] = useState(null);
+  const [statsJurnal, setStatsJurnal] = useState(null);
+  const [statsForum, setStatsForum] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [errStats, setErrStats] = useState(false);
 
   // Redirecționează dacă nu e admin
   useEffect(() => {
@@ -20,7 +29,46 @@ export default function AdminModerare() {
       return;
     }
     incarcaPostari();
+    incarcaStatistici();
   }, []);
+
+  const incarcaStatistici = async () => {
+    try {
+      const [tipuriTen, jurnal, forum] = await Promise.allSettled([
+        axios.get(`${API_URL}/api/admin/statistici/tipuri-ten`),
+        axios.get(`${API_URL}/api/admin/statistici/jurnal-lunar`),
+        axios.get(`${API_URL}/api/admin/statistici/forum-saptamana`),
+      ]);
+
+      const culori = { gras: '#f59e0b', uscat: '#3b82f6', mixt: '#8b5cf6', sensibil: '#ec4899', normal: '#10b981' };
+
+      if (tipuriTen.status === 'fulfilled' && tipuriTen.value.data.length > 0) {
+        setStatsTipuriTen({
+          labels: tipuriTen.value.data.map(d => d.tip ? d.tip.charAt(0).toUpperCase() + d.tip.slice(1) : 'Necunoscut'),
+          datasets: [{ data: tipuriTen.value.data.map(d => d.total), backgroundColor: tipuriTen.value.data.map(d => culori[d.tip] || '#94a3b8'), borderWidth: 2, borderColor: 'white' }]
+        });
+      }
+
+      if (jurnal.status === 'fulfilled' && jurnal.value.data.length > 0) {
+        setStatsJurnal({
+          labels: jurnal.value.data.map(d => d.luna),
+          datasets: [{ label: 'Intrări în jurnal', data: jurnal.value.data.map(d => d.total), borderColor: '#6aab9e', backgroundColor: 'rgba(106,171,158,0.1)', tension: 0.4, fill: true, pointBackgroundColor: '#fff', pointBorderColor: '#6aab9e' }]
+        });
+      }
+
+      if (forum.status === 'fulfilled' && forum.value.data.length > 0) {
+        setStatsForum({
+          labels: forum.value.data.map(d => new Date(d.zi).toLocaleDateString('ro-RO', { weekday: 'short', day: 'numeric', month: 'short' })),
+          datasets: [{ label: 'Postări noi', data: forum.value.data.map(d => d.total), backgroundColor: 'rgba(176,96,144,0.7)', borderColor: '#b06090', borderWidth: 1, borderRadius: 6 }]
+        });
+      }
+    } catch (e) {
+      console.log('Eroare statistici:', e);
+      setErrStats(true);
+    } finally {
+      setLoadingStats(false);
+    }
+  };
 
   const incarcaPostari = async () => {
     try {
@@ -67,7 +115,45 @@ export default function AdminModerare() {
           <p style={{ color: '#888', margin: 0, fontSize: '14px' }}>Aprobă sau respinge postările trimise de utilizatori</p>
         </div>
 
-      {/* CONȚINUT */}
+        {/* STATISTICI */}
+        <div style={{ marginBottom: '36px' }}>
+          <h2 style={{ color: '#222', fontSize: '18px', fontWeight: '700', marginBottom: '20px' }}>Statistici Platformă</h2>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+
+            {/* PIE CHART */}
+            <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: '700', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Distribuție utilizatori — tip ten</h3>
+              {statsTipuriTen ? (
+                <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Pie data={statsTipuriTen} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 12 } } } } }} />
+                </div>
+              ) : <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: '13px' }}>{errStats ? 'Serverul nu este disponibil' : loadingStats ? 'Se încarcă...' : 'Nicio dată'}</div>}
+            </div>
+
+            {/* BAR CHART */}
+            <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}>
+              <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: '700', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Activitate forum — ultimele 7 zile</h3>
+              {statsForum ? (
+                <div style={{ height: '220px' }}>
+                  <Bar data={statsForum} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f5f5f5' } }, x: { grid: { display: false } } } }} />
+                </div>
+              ) : <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: '13px' }}>{errStats ? 'Serverul nu este disponibil' : loadingStats ? 'Se încarcă...' : 'Nicio dată'}</div>}
+            </div>
+          </div>
+
+          {/* LINE CHART */}
+          <div style={{ backgroundColor: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 4px 15px rgba(0,0,0,0.06)' }}>
+            <h3 style={{ margin: '0 0 16px', fontSize: '14px', fontWeight: '700', color: '#555', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Engagement jurnal — intrări pe luni (global)</h3>
+            {statsJurnal ? (
+              <div style={{ height: '220px' }}>
+                <Line data={statsJurnal} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: '#f5f5f5' } }, x: { grid: { display: false } } } }} />
+              </div>
+            ) : <div style={{ height: '220px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: '13px' }}>{errStats ? 'Serverul nu este disponibil' : loadingStats ? 'Se încarcă...' : 'Nicio dată'}</div>}
+          </div>
+        </div>
+
+        {/* HEADER MODERARE */}
+        <h2 style={{ color: '#222', fontSize: '18px', fontWeight: '700', marginBottom: '20px' }}>Moderare Forum</h2>
       {loading ? (
         <p style={{ color: '#888' }}>Se încarcă...</p>
       ) : postariInAsteptare.length === 0 ? (

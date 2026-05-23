@@ -128,7 +128,7 @@ export default function Forum() {
         <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '24px' }}>
 
           {/* FORMULAR POSTARE */}
-          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)', alignSelf: 'start' }}>
+          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(176,96,144,0.08)', alignSelf: 'start', transition: 'all 0.2s ease' }}>
             <h3 style={{ marginTop: 0, marginBottom: '20px', color: '#222', fontSize: '16px' }}>Postare nouă</h3>
             <form onSubmit={trimitePostare} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div>
@@ -148,9 +148,10 @@ export default function Forum() {
                   onBlur={e => e.target.style.borderColor = '#e5e7eb'} />
               </div>
               <button type="submit" style={{
-                padding: '12px', backgroundColor: '#b06090',
+                padding: '12px', background: 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
                 color: 'white', border: 'none', borderRadius: '10px',
                 fontWeight: '700', fontSize: '14px', cursor: 'pointer',
+                transition: 'all 0.2s ease',
               }}>
                 Trimite spre aprobare
               </button>
@@ -174,7 +175,7 @@ export default function Forum() {
             {loadingPostari ? (
               <p style={{ color: '#aaa', textAlign: 'center' }}>Se încarcă...</p>
             ) : postariAfisate.length === 0 ? (
-              <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '20px', textAlign: 'center', color: '#aaa', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+              <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '16px', textAlign: 'center', color: '#aaa', boxShadow: '0 10px 30px rgba(176,96,144,0.08)' }}>
                 <div style={{ fontSize: '48px', marginBottom: '12px' }}>{cautare ? '🔍' : '🌱'}</div>
                 <p style={{ margin: 0 }}>{cautare ? 'Nicio postare nu corespunde căutării.' : 'Comunitatea e nouă! Fii primul/prima care postează.'}</p>
               </div>
@@ -186,11 +187,11 @@ export default function Forum() {
                     onClick={() => navigate(`/forum/${postare.id}`)}
                     style={{
                       backgroundColor: 'white', padding: '20px 22px', borderRadius: '16px',
-                      boxShadow: '0 4px 15px rgba(0,0,0,0.05)', cursor: 'pointer',
+                      boxShadow: '0 6px 20px rgba(176,96,144,0.08)', cursor: 'pointer',
                       borderLeft: '4px solid #b06090', transition: 'transform 0.15s, box-shadow 0.15s',
                     }}
-                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.1)'; }}
-                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.05)'; }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 30px rgba(176,96,144,0.15)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(176,96,144,0.08)'; }}
                   >
                     {/* Header postare */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>

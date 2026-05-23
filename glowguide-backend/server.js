@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// === RUTELE NOASTRE ===
+// Rute
 const authRoutes = require('./routes/authRoutes');
 app.use('/api/auth', authRoutes);
 
@@ -22,6 +22,8 @@ const jurnalRoutes = require('./routes/jurnalRoutes');
 app.use('/api/jurnal', jurnalRoutes);
 const forumRoutes = require('./routes/forumRoutes');
 app.use('/api/forum', forumRoutes);
+const adminRoutes = require('./routes/adminRoutes');
+app.use('/api/admin', adminRoutes);
 
 
 

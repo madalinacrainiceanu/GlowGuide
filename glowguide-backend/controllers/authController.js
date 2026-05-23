@@ -20,7 +20,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // --- PASUL 1: TRIMITE COD DE VERIFICARE PE EMAIL ---
-exports.trimiteCodum = async (req, res) => {
+exports.trimiteCodul = async (req, res) => {
     const { email, parola, nume, prenume } = req.body;
 
     try {

@@ -154,7 +154,7 @@ export default function Chatbot() {
           <button
             onClick={() => trimiteMesaj()}
             disabled={loading || !input.trim()}
-            style={{ padding: '12px 20px', backgroundColor: loading || !input.trim() ? '#d4b0c4' : '#b06090', color: 'white', border: 'none', borderRadius: '25px', fontWeight: 'bold', fontSize: '18px', cursor: loading || !input.trim() ? 'default' : 'pointer' }}
+            style={{ padding: '12px 20px', background: loading || !input.trim() ? '#d4b0c4' : 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)', color: 'white', border: 'none', borderRadius: '25px', fontWeight: 'bold', fontSize: '18px', cursor: loading || !input.trim() ? 'default' : 'pointer', transition: 'all 0.2s ease' }}
           >
             ➤
           </button>

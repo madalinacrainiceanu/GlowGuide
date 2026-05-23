@@ -319,9 +319,9 @@ const inputStyle = (bg, border, color) => ({
 });
 
 const btnPrimary = {
-  padding: '9px 20px', backgroundColor: '#b06090', color: 'white',
+  padding: '9px 20px', background: 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)', color: 'white',
   border: 'none', borderRadius: '10px', cursor: 'pointer',
-  fontSize: '13px', fontWeight: '700',
+  fontSize: '13px', fontWeight: '700', transition: 'all 0.2s ease',
 };
 
 const btnSecondary = (border, color) => ({

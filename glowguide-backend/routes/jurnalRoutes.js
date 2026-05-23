@@ -14,6 +14,6 @@ router.get('/istoric/:id', jurnalController.getIstoricJurnal);
 router.delete('/sterge/:notaId', jurnalController.stergeIntrare);
 router.put('/editeaza/:notaId', upload.single('poza'), jurnalController.editeazaIntrare);
 router.get('/export-csv/:id', jurnalController.exportCSV);
-
+router.post('/compara-evolutie', jurnalController.comparaEvolutie);
 
 module.exports = router;

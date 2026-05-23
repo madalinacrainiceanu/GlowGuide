@@ -2,7 +2,55 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Poppins', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+}
+
+/* ===================== NAV LINKS ===================== */
+.nav-link {
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-link:hover {
+  background-color: rgba(176, 96, 144, 0.1);
+}
+
+[data-theme='dark'] .nav-link:hover {
+  background-color: rgba(176, 96, 144, 0.18);
+}
+
+/* ===================== GRADIENT BUTTON ===================== */
+.btn-gradient {
+  background: linear-gradient(135deg, #b06090 0%, #e8956d 100%);
+  border: none;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-gradient:hover {
+  background: linear-gradient(135deg, #e8956d 0%, #b06090 100%);
+  box-shadow: 0 6px 20px rgba(176, 96, 144, 0.35);
+  transform: translateY(-1px);
+}
+
+/* ===================== CARD GLOW ===================== */
+.card-glow {
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(176, 96, 144, 0.08);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card-glow:hover {
+  box-shadow: 0 14px 40px rgba(176, 96, 144, 0.14);
+  transform: translateY(-2px);
 }
 
 :root {

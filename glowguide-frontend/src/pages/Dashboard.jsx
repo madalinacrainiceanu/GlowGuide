@@ -60,7 +60,7 @@ export default function Dashboard() {
       <Navbar />
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '32px 20px' }}>
         <div style={{
-          backgroundColor: '#b06090',
+          background: 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
           borderRadius: '16px', padding: '32px 36px', marginBottom: '36px',
           color: 'white',
         }}>
