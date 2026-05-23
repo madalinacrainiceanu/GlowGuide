@@ -23,6 +23,11 @@ export default function Jurnal() {
   const [dateGrafic, setDateGrafic] = useState(null);
   const [istoric, setIstoric] = useState([]); 
 
+  // Stările pentru comparare AI
+  const [imaginiSelectate, setImaginiSelectate] = useState([]);
+  const [analizaAI, setAnalizaAI] = useState('');
+  const [seIncarcaAI, setSeIncarcaAI] = useState(false);
+
   // Stările pentru modul de EDITARE
   const [editareId, setEditareId] = useState(null);
   const [ratingEdit, setRatingEdit] = useState(5);
@@ -142,6 +147,33 @@ export default function Jurnal() {
       }
   };
 
+  const toggleSelectare = (id, url) => {
+    setAnalizaAI('');
+    setImaginiSelectate(prev => {
+      const esteSelectat = prev.find(i => i.id === id);
+      if (esteSelectat) return prev.filter(i => i.id !== id);
+      if (prev.length >= 2) return prev;
+      return [...prev, { id, url }];
+    });
+  };
+
+  const comparaEvolutie = async () => {
+    if (imaginiSelectate.length !== 2) return;
+    setSeIncarcaAI(true);
+    setAnalizaAI('');
+    try {
+      const raspuns = await axios.post(`${API_URL}/api/jurnal/compara-evolutie`, {
+        url1: imaginiSelectate[0].url,
+        url2: imaginiSelectate[1].url
+      });
+      setAnalizaAI(raspuns.data.analiza);
+    } catch (e) {
+      setAnalizaAI('Eroare la analiza AI. Încearcă din nou.');
+    } finally {
+      setSeIncarcaAI(false);
+    }
+  };
+
   const formateazaData = (dataString) => {
     if (!dataString) return 'Azi';
     const formatCurat = typeof dataString === 'string' ? dataString.split('T')[0] : dataString;
@@ -177,7 +209,7 @@ export default function Jurnal() {
       <div className="responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '24px' }}>
           
           {/* FORMULAR ADAUGARE */}
-          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(176,96,144,0.08)' }}>
               <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>Scrie o filă nouă</h3>
               <form onSubmit={adaugaIntrare} style={{ display: 'flex', flexDirection: 'column', gap: '18px' }}>
               <div>
@@ -218,9 +250,10 @@ export default function Jurnal() {
                   )}
               </div>
               <button type="submit" style={{
-                padding: '13px', backgroundColor: '#b06090',
+                padding: '13px', background: 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
                 color: 'white', border: 'none', borderRadius: '10px',
                 fontWeight: '700', fontSize: '15px', cursor: 'pointer',
+                transition: 'all 0.2s ease',
               }}>
                   Salvează în Jurnal
               </button>
@@ -229,7 +262,7 @@ export default function Jurnal() {
           </div>
 
           {/* GRAFIC */}
-          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '20px', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
+          <div style={{ backgroundColor: 'white', padding: '28px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(176,96,144,0.08)' }}>
               <h3 style={{ marginBottom: '20px', color: '#222', fontSize: '16px', marginTop: 0 }}>Evoluție Ten</h3>
               {dateGrafic ? (
               <div style={{ width: '100%', height: '260px' }}>
@@ -247,6 +280,38 @@ export default function Jurnal() {
       {/* AGENDA */}
       <div style={{ marginTop: '32px' }}>
           <h2 style={{ color: '#222', marginBottom: '20px', fontSize: '18px' }}>Filele Jurnalului</h2>
+
+          {/* PANOU COMPARARE AI */}
+          {imaginiSelectate.length > 0 && (
+            <div style={{ backgroundColor: '#fdf4ff', border: '2px solid #d8a8e8', borderRadius: '16px', padding: '18px 22px', marginBottom: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <p style={{ margin: 0, fontWeight: '700', color: '#7c3aed', fontSize: '14px' }}>
+                    Comparare evoluție cu AI
+                  </p>
+                  <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#888' }}>
+                    {imaginiSelectate.length === 1 ? 'Selectează încă o poză pentru comparare' : '2 poze selectate — apăsați butonul pentru analiză'}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                  <button onClick={() => { setImaginiSelectate([]); setAnalizaAI(''); }} style={{ padding: '7px 14px', backgroundColor: 'white', color: '#888', border: '1px solid #ddd', borderRadius: '8px', cursor: 'pointer', fontSize: '13px' }}>
+                    Anulează
+                  </button>
+                  {imaginiSelectate.length === 2 && (
+                    <button onClick={comparaEvolutie} disabled={seIncarcaAI} style={{ padding: '9px 20px', background: 'linear-gradient(135deg, #a855f7, #ec4899)', color: 'white', border: 'none', borderRadius: '10px', cursor: seIncarcaAI ? 'not-allowed' : 'pointer', fontWeight: '700', fontSize: '14px', opacity: seIncarcaAI ? 0.7 : 1 }}>
+                      {seIncarcaAI ? 'Se analizează...' : 'Analizează Evoluția'}
+                    </button>
+                  )}
+                </div>
+              </div>
+              {analizaAI && (
+                <div style={{ backgroundColor: 'white', borderRadius: '12px', padding: '16px', border: '1px solid #e9d5ff' }}>
+                  <p style={{ margin: '0 0 6px', fontSize: '12px', fontWeight: '700', color: '#7c3aed', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Analiză AI</p>
+                  <p style={{ margin: 0, fontSize: '14px', color: '#444', lineHeight: '1.7' }}>{analizaAI}</p>
+                </div>
+              )}
+            </div>
+          )}
           
           {istoric.length === 0 ? (
               <div style={{ backgroundColor: 'white', padding: '40px', borderRadius: '20px', textAlign: 'center', color: '#bbb', boxShadow: '0 4px 20px rgba(0,0,0,0.06)' }}>
@@ -259,7 +324,8 @@ export default function Jurnal() {
                       <div key={intrare.id} style={{ 
                           backgroundColor: 'white', borderLeft: '4px solid #b06090',
                           borderRadius: '14px', padding: '22px 24px',
-                          boxShadow: '0 4px 15px rgba(0,0,0,0.05)'
+                          boxShadow: '0 6px 20px rgba(176,96,144,0.08)',
+                          transition: 'all 0.2s ease',
                       }}>
                           {/* MODUL EDITARE */}
                           {editareId === intrare.id ? (
@@ -295,6 +361,15 @@ export default function Jurnal() {
                                       </span>
                                       
                                       <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}>
+                                          {intrare.poza && (() => {
+                                            const esteSelectat = !!imaginiSelectate.find(i => i.id === intrare.id);
+                                            const dezactivat = !esteSelectat && imaginiSelectate.length >= 2;
+                                            return (
+                                              <button onClick={() => toggleSelectare(intrare.id, intrare.poza)} disabled={dezactivat} title={esteSelectat ? 'Deselectează' : 'Selectează pentru comparare AI'} style={{ background: esteSelectat ? 'linear-gradient(135deg, #a855f7, #ec4899)' : 'white', color: esteSelectat ? 'white' : '#a855f7', border: '1.5px solid #a855f7', borderRadius: '8px', padding: '4px 10px', cursor: dezactivat ? 'not-allowed' : 'pointer', fontSize: '12px', fontWeight: '700', opacity: dezactivat ? 0.4 : 1 }}>
+                                                {esteSelectat ? '✓ Selectat' : '✨ Compară'}
+                                              </button>
+                                            );
+                                          })()}
                                           <button onClick={() => pornesteEditare(intrare)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px'}} title="Editează">✏️</button>
                                           <button onClick={() => stergeNota(intrare.id)} style={{background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px'}} title="Șterge">🗑️</button>
                                           <span style={{ 

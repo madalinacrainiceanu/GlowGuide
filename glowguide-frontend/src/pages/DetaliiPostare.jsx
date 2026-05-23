@@ -114,7 +114,7 @@ export default function DetaliiPostare() {
             required
             style={{ width: '100%', padding: '12px', borderRadius: '10px', border: '1px solid #e0e0e0', resize: 'vertical', fontSize: '14px', boxSizing: 'border-box' }}
           />
-          <button type="submit" style={{ padding: '12px', backgroundColor: '#b06090', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', alignSelf: 'flex-end', minWidth: '150px' }}>
+          <button type="submit" style={{ padding: '12px', background: 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)', color: 'white', border: 'none', borderRadius: '10px', fontWeight: 'bold', fontSize: '15px', cursor: 'pointer', alignSelf: 'flex-end', minWidth: '150px', transition: 'all 0.2s ease' }}>
             💬 Răspunde
           </button>
         </form>

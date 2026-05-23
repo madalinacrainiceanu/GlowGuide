@@ -320,9 +320,10 @@ export default function Profil() {
               disabled={loading}
               style={{
                 width: '100%', padding: '16px',
-                background: loading ? '#d4b0c4' : '#b06090',
+                background: loading ? '#d4b0c4' : 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
                 color: 'white', border: 'none', borderRadius: '14px',
                 fontWeight: '700', fontSize: '16px', cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
               }}
             >
               {loading ? 'Se analizează...' : 'Generează Diagnostic și Rutină'}

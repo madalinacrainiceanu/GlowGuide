@@ -4,7 +4,7 @@ export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh', fontFamily: "'Segoe UI', system-ui, sans-serif" }}>
+    <div style={{ backgroundColor: 'var(--bg)', minHeight: '100vh' }}>
 
       {/* NAVBAR */}
       <nav style={{
@@ -23,8 +23,9 @@ export default function LandingPage() {
             }}>Intră în cont</button>
             <button onClick={() => navigate('/register')} style={{
               padding: '8px 22px', border: 'none', borderRadius: '8px',
-              backgroundColor: '#b06090', color: 'white',
-              fontWeight: '600', fontSize: '14px', cursor: 'pointer',
+              background: 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
+              color: 'white', fontWeight: '600', fontSize: '14px', cursor: 'pointer',
+              transition: 'all 0.2s ease',
             }}>Înregistrare</button>
           </div>
         </div>
@@ -49,9 +50,10 @@ export default function LandingPage() {
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
           <button onClick={() => navigate('/register')} style={{
             padding: '14px 36px', border: 'none', borderRadius: '10px',
-            backgroundColor: '#b06090', color: 'white',
-            fontWeight: '700', fontSize: '15px', cursor: 'pointer',
-            boxShadow: '0 4px 16px rgba(176,96,144,0.2)',
+            background: 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
+            color: 'white', fontWeight: '700', fontSize: '15px', cursor: 'pointer',
+            boxShadow: '0 4px 16px rgba(176,96,144,0.25)',
+            transition: 'all 0.2s ease',
           }}>Începe gratuit</button>
           <button onClick={() => navigate('/login')} style={{
             padding: '14px 28px', border: '1.5px solid #d4c5ce', borderRadius: '10px',

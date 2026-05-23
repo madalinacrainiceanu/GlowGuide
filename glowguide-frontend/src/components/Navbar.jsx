@@ -54,8 +54,8 @@ export default function Navbar() {
   return (
     <>
       <nav style={{
-        backgroundColor: darkMode ? '#16213e' : 'white',
-        boxShadow: '0 2px 12px rgba(45,49,66,0.08)',
+        background: darkMode ? '#16213e' : 'linear-gradient(90deg, #f7d9ee 0%, #fde8d8 100%)',
+        boxShadow: '0 2px 20px rgba(176,96,144,0.18)',
         position: 'sticky',
         top: 0,
         zIndex: 1000,
@@ -87,16 +87,14 @@ export default function Navbar() {
               <button
                 key={l.path}
                 onClick={() => navigate(l.path)}
+                className="nav-link"
                 style={{
-                  padding: '6px 12px',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontSize: '13px',
-                  fontWeight: isActive(l.path) ? '700' : '500',
-                  backgroundColor: isActive(l.path) ? '#f7eef4' : 'transparent',
+                  padding: '6px 14px',
+                  fontSize: '1.05rem',
+                  fontWeight: isActive(l.path) ? '700' : '600',
+                  letterSpacing: '0.3px',
+                  backgroundColor: isActive(l.path) ? '#f7eef4' : undefined,
                   color: isActive(l.path) ? '#b06090' : (darkMode ? '#c0b8d0' : '#7a7a8c'),
-                  transition: 'all 0.2s',
                 }}
               >
                 {l.label}

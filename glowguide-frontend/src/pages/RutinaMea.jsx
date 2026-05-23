@@ -82,9 +82,10 @@ export default function RutinaMea() {
               onClick={genereazaRutina} disabled={loading}
               style={{
                 padding: '14px 36px',
-                backgroundColor: loading ? '#d4b0c4' : '#b06090',
+                background: loading ? '#d4b0c4' : 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
                 color: 'white', border: 'none', borderRadius: '12px',
                 fontSize: '16px', fontWeight: '700', cursor: loading ? 'not-allowed' : 'pointer',
+                transition: 'all 0.2s ease',
               }}
             >
               {loading ? 'Se calculează...' : 'Generează Rutina'}
@@ -143,8 +144,9 @@ export default function RutinaMea() {
                 <div key={produs.id} style={{
                   display: 'flex', alignItems: 'center', gap: '16px',
                   backgroundColor: 'white', padding: '18px 22px', borderRadius: '14px',
-                  boxShadow: '0 4px 15px rgba(0,0,0,0.05)',
+                  boxShadow: '0 6px 20px rgba(176,96,144,0.08)',
                   borderLeft: '4px solid #b06090',
+                  transition: 'all 0.2s ease',
                 }}>
                   <div style={{
                     width: '42px', height: '42px', borderRadius: '12px',

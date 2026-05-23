@@ -93,10 +93,10 @@ export default function Login() {
               type="submit" disabled={loading}
               style={{
                 padding: '13px', marginTop: '4px',
-                background: loading ? '#d4b0c4' : '#b06090',
+                background: loading ? '#d4b0c4' : 'linear-gradient(135deg, #b06090 0%, #e8956d 100%)',
                 color: 'white', border: 'none', borderRadius: '10px',
                 fontWeight: '700', fontSize: '15px', cursor: loading ? 'not-allowed' : 'pointer',
-                boxShadow: '0 4px 15px rgba(176,96,144,0.25)', transition: 'all 0.2s'
+                boxShadow: '0 4px 15px rgba(176,96,144,0.25)', transition: 'all 0.2s ease'
               }}
             >
               {loading ? 'Se încarcă...' : 'Intră în cont →'}

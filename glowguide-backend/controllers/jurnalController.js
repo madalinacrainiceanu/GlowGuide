@@ -1,5 +1,8 @@
 const sequelize = require('../db');
 const { cloudinary } = require('../uploadMiddleware');
+const OpenAI = require('openai');
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Funcția 1: Adaugă notă (cu poză opțională)
 exports.adaugaIntrare = async (req, res) => {
@@ -165,6 +168,31 @@ exports.editeazaIntrare = async (req, res) => {
         res.json({ mesaj: 'Notă actualizată!' });
     } catch (error) {
         res.status(500).json({ eroare: 'Nu s-a putut edita.' });
+    }
+};
+
+exports.comparaEvolutie = async (req, res) => {
+    const { url1, url2 } = req.body;
+    if (!url1 || !url2) {
+        return res.status(400).json({ eroare: 'Sunt necesare exact 2 imagini.' });
+    }
+    try {
+        const response = await openai.chat.completions.create({
+            model: 'gpt-4o',
+            messages: [{
+                role: 'user',
+                content: [
+                    { type: 'text', text: 'Ești un dermatolog virtual. Analizează starea tenului din aceste două imagini. Prima imagine este mai veche, a doua este mai recentă. Descrie evoluția observată: ce s-a îmbunătățit, ce a rămas la fel sau s-a înrăutățit. Răspunde în română, în maximum 150 de cuvinte, într-un mod prietenos.' },
+                    { type: 'image_url', image_url: { url: url1 } },
+                    { type: 'image_url', image_url: { url: url2 } }
+                ]
+            }],
+            max_tokens: 400
+        });
+        res.json({ analiza: response.choices[0].message.content });
+    } catch (error) {
+        console.error('Eroare OpenAI Vision:', error);
+        res.status(500).json({ eroare: 'Eroare la analiza AI. Încearcă din nou.' });
     }
 };
 
