@@ -46,7 +46,7 @@ export default function Login() {
           boxShadow: '0 20px 60px rgba(45,49,66,0.10)', padding: '36px'
         }}>
           <h2 style={{ color: '#222', fontSize: '20px', fontWeight: '700', marginBottom: '24px', textAlign: 'center' }}>
-            Bun venit înapoi
+            Bun venit înapoi!
           </h2>
 
           {eroare && (
