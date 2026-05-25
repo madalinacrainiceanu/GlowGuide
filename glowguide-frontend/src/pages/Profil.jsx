@@ -157,6 +157,7 @@ export default function Profil() {
         probleme: JSON.stringify(diagnostic.problemeBackend),
         alergii: JSON.stringify(arrayAlergii),
       });
+      localStorage.removeItem(`rutina_${user.id}`);
       setPas(INTREBARI.length + 1); // rezultat
       setTimeout(() => navigate('/rutina'), 4000);
     } catch {

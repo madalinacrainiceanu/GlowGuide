@@ -43,10 +43,9 @@ exports.genereazaRutina = async (req, res) => {
             const categorie = categorii[i];
             
             let excludereAlergeniSql = '';
-            // "%" permite căutarea de tip LIKE. Ex: dacă produsul scrie 'normal,mixt', va găsi 'mixt'
+            
             let replacements = [categorie, `%${tipTenUser}%`];
 
-            // Dacă utilizatorul are alergii, adăugăm o regulă SQL complexă cu NOT EXISTS
             if (alergeniArray.length > 0) {
                 const placeholders = alergeniArray.map(() => '?').join(',');
                 excludereAlergeniSql = `
@@ -93,7 +92,7 @@ exports.genereazaRutina = async (req, res) => {
                     }
                 }
             } else {
-                // Prima generare: cel mai bun produs după rating
+                
                 const queryText = `
                     SELECT DISTINCT p.id, p.nume, p.brand, p.categorie, p.rating
                     FROM produs p
@@ -107,7 +106,7 @@ exports.genereazaRutina = async (req, res) => {
                 if (produsGasit.length > 0) produsAles = produsGasit[0];
             }
 
-            // Dacă baza de date a găsit un produs bun, îl adăugăm la lista finală
+            
             if (produsAles) {
                 produseRecomandate.push(produsAles);
             }

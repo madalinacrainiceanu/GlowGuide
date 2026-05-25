@@ -51,6 +51,12 @@ export default function RutinaMea() {
     }
   };
 
+  useEffect(() => {
+    if (!rutinaInitiala && user) {
+      genereazaRutina();
+    }
+  }, []);
+
   const EMOJI_CATEGORIE = {
     curatare: '🧴', toner: '💧', ser: '✨', hidratant: '🌊', spf: '☀️',
     exfoliant: '🌿', ochi: '👁️', masca: '🎭'

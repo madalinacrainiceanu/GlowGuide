@@ -30,6 +30,12 @@ export default function AdminModerare() {
     }
     incarcaPostari();
     incarcaStatistici();
+
+    const interval = setInterval(() => {
+      incarcaStatistici();
+    }, 30000);
+
+    return () => clearInterval(interval);
   }, []);
 
   const incarcaStatistici = async () => {
