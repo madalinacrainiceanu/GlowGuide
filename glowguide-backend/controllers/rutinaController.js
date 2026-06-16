@@ -28,11 +28,11 @@ exports.genereazaRutina = async (req, res) => {
              }
         }
 
-        // 2. Arhivăm o rutină veche, dacă membrul avea deja una activă
-        await sequelize.query(
-            `UPDATE rutina SET status = 'arhivata' WHERE membruId = ? AND status = 'activa'`,
-            { replacements: [membruId] }
-        );
+          // 2. Arhivăm o rutină veche, dacă membrul avea deja una activă
+          await sequelize.query(
+                `UPDATE rutina SET status = 'arhivata' WHERE membruId = ? AND status = 'activa'`,
+                { replacements: [membruId] }
+          );
 
         // Categoriile standard pe care trebuie să le conțină rutina
         const categorii = ['curatare', 'toner', 'ser', 'hidratant', 'spf'];
@@ -123,7 +123,7 @@ exports.genereazaRutina = async (req, res) => {
         for (let i = 0; i < produseRecomandate.length; i++) {
             const produs = produseRecomandate[i];
             await sequelize.query(
-                `INSERT INTO rutinaprodus (rutinaId, produsId, ordineAplicare) VALUES (?, ?, ?)`,
+                `INSERT INTO rutinaprodus (rutinaId, produsId, ordineAplicare) VALUES (?, ?, ?)` ,
                 { replacements: [rutinaId, produs.id, i + 1] }
             );
         }

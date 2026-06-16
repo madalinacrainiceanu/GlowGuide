@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 require('dotenv').config();
 
-console.log("=== DATE DE CONEXIUNE ===");
+console.log("DATE DE CONEXIUNE");
 console.log("DB_NAME:", process.env.DB_NAME);
 console.log("DB_USER:", process.env.DB_USER);
 console.log("DB_PASSWORD:", process.env.DB_PASSWORD);
@@ -22,10 +22,10 @@ const sequelize = new Sequelize(
 
 sequelize.authenticate()
   .then(() => {
-    console.log('✅ Conexiunea la baza de date MySQL (glowguide_db) a fost realizată cu succes!');
+    console.log(' Conexiunea la baza de date MySQL (glowguide_db) a fost realizată cu succes!');
   })
   .catch((error) => {
-    console.error('❌ Eroare la conectarea cu baza de date:', error.original || error);
+    console.error(' Eroare la conectarea cu baza de date:', error.original || error);
   });
 
 module.exports = sequelize;
