@@ -41,7 +41,7 @@ export default function Register() {
     try {
       await axios.post(`${API_URL}/api/auth/verifica-cod`, { email, cod });
       setSucces('Cont creat cu succes! Te redirecționăm...');
-      setTimeout(() => navigate('/'), 2000);
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       setEroare(err.response?.data?.eroare || 'Cod incorect sau expirat.');
     } finally {
