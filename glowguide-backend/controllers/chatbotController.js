@@ -12,6 +12,22 @@ const normalizeaza = (str) => str
     .replace(/ș|ş/g, 's').replace(/ț|ţ/g, 't')
     .replace(/ă/g, 'a').replace(/â|î/g, 'i');
 
+const STOP_WORDS = new Set([
+    'este', 'sunt', 'care', 'cum', 'face', 'faci', 'poti', 'trebuie',
+    'pentru', 'despre', 'folosesc', 'daca', 'dupa', 'cand', 'unde',
+    'ce', 'cea', 'cel', 'cei', 'cele', 'mai', 'sau', 'si', 'din', 'pe'
+]);
+
+const TERMENI_SCURTI_IMPORTANTI = new Set(['spf', 'aha', 'bha', 'ha', 'uv', 'ph', 'ten']);
+
+const extrageCuvinteRelevante = (text) => text
+    .split(/\s+/)
+    .filter(Boolean)
+    .filter(c => c.length > 3 || TERMENI_SCURTI_IMPORTANTI.has(c))
+    .filter(c => !STOP_WORDS.has(c));
+
+const INTENT_FRECVENTA_REGEX = /(cat de des|de cate ori|frecvent|zilnic|reaplic)/;
+
 exports.intreaba = async (req, res) => {
     const { intrebare } = req.body;
 
@@ -21,9 +37,8 @@ exports.intreaba = async (req, res) => {
 
     try {
         const intrebareNorm = normalizeaza(intrebare);
-        const cuvinte = intrebareNorm
-            .split(' ')
-            .filter(c => c.length > 3 && !['este', 'sunt', 'care', 'cum', 'face', 'faci', 'poti', 'trebuie', 'pentru', 'despre', 'folosesc'].includes(c));
+            const cuvinte = extrageCuvinteRelevante(intrebareNorm);
+            const intentFrecventa = INTENT_FRECVENTA_REGEX.test(intrebareNorm);
 
         // STRATEGIA 1: Căutare după cuvinteCheie cu scor
         if (cuvinte.length > 0) {
@@ -32,7 +47,11 @@ exports.intreaba = async (req, res) => {
 
             const [rezultateCK] = await sequelize.query(
                 `SELECT id, raspuns, categorie, numarAfisari,
-                    (${cuvinte.map(() => '(CASE WHEN LOWER(cuvinteCheie) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor
+                        (${cuvinte.map(() => '(CASE WHEN LOWER(cuvinteCheie) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor,
+                        CASE 
+                            WHEN LOWER(CONCAT(COALESCE(cuvinteCheie, ''), ' ', COALESCE(intrebare, ''))) REGEXP 'cat de des|de cate ori|frecvent|zilnic|reaplic'
+                            THEN 1 ELSE 0
+                        END AS intentFrecventaPotrivita
                  FROM faq
                  WHERE ${conditii}
                  ORDER BY scor DESC, numarAfisari DESC
@@ -40,9 +59,15 @@ exports.intreaba = async (req, res) => {
                 { replacements: [...valori, ...valori] }
             );
 
-            const scorMinim = cuvinte.length >= 2 ? 2 : 1;
+                const scorMinim = cuvinte.length >= 4 ? 3 : (cuvinte.length >= 2 ? 2 : 1);
+                const acoperireMinima = cuvinte.length >= 4 ? 0.6 : (cuvinte.length >= 2 ? 0.5 : 1);
 
-            if (rezultateCK.length > 0 && rezultateCK[0].scor >= scorMinim) {
+                if (
+                    rezultateCK.length > 0 &&
+                    rezultateCK[0].scor >= scorMinim &&
+                    (rezultateCK[0].scor / cuvinte.length) >= acoperireMinima &&
+                    (!intentFrecventa || rezultateCK[0].intentFrecventaPotrivita === 1)
+                ) {
                 await sequelize.query(
                     'UPDATE faq SET numarAfisari = numarAfisari + 1 WHERE id = ?',
                     { replacements: [rezultateCK[0].id] }
@@ -62,7 +87,11 @@ exports.intreaba = async (req, res) => {
 
             const [rezultateInt] = await sequelize.query(
                 `SELECT id, raspuns, categorie,
-                    (${cuvinte.map(() => '(CASE WHEN LOWER(intrebare) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor
+                        (${cuvinte.map(() => '(CASE WHEN LOWER(intrebare) LIKE ? THEN 1 ELSE 0 END)').join('+')}) AS scor,
+                        CASE 
+                            WHEN LOWER(CONCAT(COALESCE(cuvinteCheie, ''), ' ', COALESCE(intrebare, ''))) REGEXP 'cat de des|de cate ori|frecvent|zilnic|reaplic'
+                            THEN 1 ELSE 0
+                        END AS intentFrecventaPotrivita
                  FROM faq
                  WHERE ${conditiiIntrebare}
                  ORDER BY scor DESC, numarAfisari DESC
@@ -70,9 +99,15 @@ exports.intreaba = async (req, res) => {
                 { replacements: [...valoriIntrebare, ...valoriIntrebare] }
             );
 
-            const scorMinim2 = cuvinte.length >= 2 ? 2 : 1;
+                const scorMinim2 = cuvinte.length >= 4 ? 3 : (cuvinte.length >= 2 ? 2 : 1);
+                const acoperireMinima2 = cuvinte.length >= 4 ? 0.6 : (cuvinte.length >= 2 ? 0.5 : 1);
 
-            if (rezultateInt.length > 0 && rezultateInt[0].scor >= scorMinim2) {
+                if (
+                    rezultateInt.length > 0 &&
+                    rezultateInt[0].scor >= scorMinim2 &&
+                    (rezultateInt[0].scor / cuvinte.length) >= acoperireMinima2 &&
+                    (!intentFrecventa || rezultateInt[0].intentFrecventaPotrivita === 1)
+                ) {
                 await sequelize.query(
                     'UPDATE faq SET numarAfisari = numarAfisari + 1 WHERE id = ?',
                     { replacements: [rezultateInt[0].id] }
