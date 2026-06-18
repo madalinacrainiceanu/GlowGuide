@@ -60,7 +60,7 @@ exports.intreaba = async (req, res) => {
             );
 
                 const scorMinim = cuvinte.length >= 4 ? 3 : (cuvinte.length >= 2 ? 2 : 1);
-                const acoperireMinima = cuvinte.length >= 4 ? 0.6 : (cuvinte.length >= 2 ? 0.5 : 1);
+                const acoperireMinima = 0.9;
 
                 if (
                     rezultateCK.length > 0 &&
@@ -100,7 +100,7 @@ exports.intreaba = async (req, res) => {
             );
 
                 const scorMinim2 = cuvinte.length >= 4 ? 3 : (cuvinte.length >= 2 ? 2 : 1);
-                const acoperireMinima2 = cuvinte.length >= 4 ? 0.6 : (cuvinte.length >= 2 ? 0.5 : 1);
+                const acoperireMinima2 = 0.9;
 
                 if (
                     rezultateInt.length > 0 &&
