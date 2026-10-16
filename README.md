@@ -4,10 +4,6 @@ GlowGuide is a full-stack web application for personalized skincare routines. Th
 
 The project combines a React frontend, a Node.js REST API and a MySQL database. It also includes data visualization, a community forum with moderation features and an AI-assisted chatbot.
 
-## Live demo
-
-[Open GlowGuide](https://licenta-theta.vercel.app/)
-
 ## Main features
 
 - Skin profile questionnaire
@@ -19,6 +15,34 @@ The project combines a React frontend, a Node.js REST API and a MySQL database. 
 - Community forum with moderation features
 - Public user profiles
 - FAQ-based chatbot with an OpenAI fallback
+
+## Screenshots
+
+### Authentication
+
+![GlowGuide authentication](docs/screenshots/01-authentication.png)
+
+### Skin analysis questionnaire
+
+![Skin analysis questionnaire](docs/screenshots/02-skin-analysis-questionnaire.png)
+
+### Personalized skincare routine
+
+![Personalized skincare routine](docs/screenshots/03-personalized-routine.png)
+
+### AI-powered skin comparison
+
+![AI-powered skin comparison](docs/screenshots/04-ai-skin-comparison.png)
+
+### GlowBot chatbot
+
+![GlowBot chatbot](docs/screenshots/05-glowbot-chatbot.png)
+
+### Admin dashboard
+
+![Admin dashboard with statistics](docs/screenshots/06-admin-statistics.png)
+
+
 
 ## Application architecture
 
